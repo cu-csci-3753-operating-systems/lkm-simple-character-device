@@ -228,3 +228,5 @@ Implement `write`, then `read`.
 ### Checkpoint 3
 
 Implement `llseek`
+	
+For testing your device driver, you should modify the `seek` lab code so that you can monitor the contents of your device driver's buffer from userland. 
