@@ -186,24 +186,33 @@ my_read, my_write, my_llseek, my_open, my_release
 
  - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for our assignment).
 
+
+## Testing
+
 - For testing your device driver, you should modify the `seek` lab code so you can monitor the content of your device driver's buffer from user space. It is possible for read, write, and seek to appear functional in your `C` test code, but not interface properly with unix system utilities such as `echo`, `tail`, `head`, and so on. This means your implementation is incorrect, so be sure that your code interfaces with these utilities. Recall that `strace` allows you to see how these utilities are interfacing with your device. 
 
-\subsection{Testing}
-
-We can do some ``quick and dirty" testing by doing I/O redirection in the terminal as follows:
-\begin{verbatim}
+- An easy way to test the write functionality of your device driver is to perform I/O redirection in the terminal as follows:
+```
 echo 'hello world' > /dev/simple_character_device
-\end{verbatim}
-which will write ``hello world" to our character device driver. To test the reading of characters from our device, try using the \texttt{cat} command, which will open, read repeatedly until EOF is reached, and then close the file.
+```
+which will write ``hello world" to our character device driver. 
+- To test the reading of characters from our device, try using the \texttt{cat} command, which will open, read repeatedly until EOF is reached, and then close the file.
 ```
 cat /dev/simple_character_device
 ```
-However, to properly test \texttt{llseek()}, \emph{you will need to write your own test program} in \texttt{C} to test it. Remember, our character device is a \emph{file}, so we can use familiar file I/O operations (e.g., \texttt{fopen}, \texttt{fclose}, \texttt{fseek}, etc..) for creating our test program. Your test program should also test the functionality of \texttt{read} and \texttt{write}. You are free to consult your notes or online tutorials about file I/O in \texttt{C}.
+- To partially test `llseek` functionality you may use the `tail` system utility. In particular, you may look at `test.py` to see other test cases that will be used to test your code. To thoroughly test \texttt{llseek()} you will need to write your own test program in C by modifying the `seek` lab. Remember, our character device is a <i>file</i>, so we can use familiar file I/O operations (e.g., `fopen`, `fclose`, `fseek`, etc..) for creating our test program. You are free to consult your notes or online tutorials about file I/O in C.
 
 ## Submission Instructions
 
-You must follow these instructions carefully; otherwise, your solution will not interface with the grading script `test.py` and you will lose many points.
-For submitting this assignment, create a zip file (use filename: $<$your last name$>$\_PA1.zip) with all the files you have modified to create your new device driver. Submit that zip file as your submission in Moodle.
+You must follow these instructions carefully; otherwise, your solution will not interface with the script `test.py` and you will lose many points.
+
+- `/home/kernel/<your last name>_PA1/`
+	- `Makefile`: A makefile that will compile your LKM code (simply modify the Makefile in `/home/kernel/helloworld`).
+	- `load.sh`: An executable `bash` script that will run the `mknod` and `insmod` commands to install your character device driver.
+	- `unload.sh`: An executable `bash` script that will run the `rm` and `rmmod` commands to uninstall your character device driver.
+	- `my_driver.c:` Your LKM driver code.
+
+For submitting this assignment, create a zip file (use filename `<your last name>_PA1.zip`) and zip the directory above. Submit that zip file as your submission in Moodle.
 
 
 ## Grading
