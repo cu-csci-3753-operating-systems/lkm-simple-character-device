@@ -74,21 +74,21 @@ Each device will have a corresponding device file that is located in the \texttt
 To add a new device you need to create a new entry in the \texttt{/dev} directory. Each virtual file has information associated with it to tell the kernel which device driver to use when accessing the device. Recall that in Linux, each device driver is given a device \emph{major number} to uniquely identify it.
 
 You can create a new virtual device file to be associated with your device driver. First, we'll find an unused major number for your kernel, then we'll use the \texttt{mknod} command to create a new device entry and associate the new major number for your device driver. 
-\begin{verbatim}
+```
 sudo mknod  <location> <type of driver> <major number> <minor number>
-\end{verbatim}
+```
 The major number should be unique and you can look at current devices already installed, but usually user modules start at 240.  The \emph{minor number} can be 0. The type of our driver should be \texttt{c} for character. Note that more sophisticated drivers must deal with blocks of arbitrary data, in which case the type is \texttt{b} (see \texttt{man mknod} for more details).  Putting it all together, run the following command:
-\begin{verbatim}
+```
 sudo mknod /dev/simple_character_device c 240 0
-\end{verbatim}
+```
 Note that \texttt{simple\_character\_device} is a file, so we can change its permissions using \texttt{chmod}.  To be sure that we can read, write, and execute this file, run the following command:
-\begin{verbatim}
+```
 sudo chmod 777 /dev/simple_character_device
-\end{verbatim}
+```
 Using \texttt{hellomodule.c} as template, in a new \texttt{C} file \texttt{my\_driver.c}, your task is to create a new character device driver that suports the following file operations: 
-\begin{center}
-\texttt{open, read, write, llseek, release}
-\end{center}
+```
+open, read, write, llseek, release
+```
 which we will discuss in more detail momentarily.
 Immediately, we observe that a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. In your previous courses, you have more than likely encountered many sophisticated implementations of buffers.  For this assignment we will not be concerned about such implementations. The buffer should be an array of 1024 characters.  In the next section, we discuss how we \emph{register} our device driver.
 
@@ -161,25 +161,21 @@ The close functionality is handled by \texttt{release}. Since we are developing 
 
 offset_t llseek(int fildes, offset_t offset, int whence);
 ```
-The llseek function sets the 64-bit extended file pointer associated with the open file descriptor specified by fildes as follows:
+The ``llseek`` function sets the 64-bit extended file pointer associated with the open file descriptor specified by fildes as follows:
 
-\begin{itemize}
-\item If whence is \texttt{SEEK\_SET}, the pointer is set to offset bytes.
-\item If whence is \texttt{SEEK\_CUR}, the pointer is set to its current location plus offset.
-\item If whence is \texttt{SEEK\_END}, the pointer is set to the size of the file plus offset.
-\end{itemize}
+- If whence is `SEEK_SET`, the pointer is set to offset bytes.
+- If whence is `SEEK_CUR`, the pointer is set to its current location plus offset.
+- If whence is `SEEK_END`, the pointer is set to the size of the file plus offset.
 
-Upon successful completion, llseek returns the resulting pointer location \emph{as measured in bytes from the beginning of the file}. Otherwise, -1 is returned, the file pointer remains unchanged. Here, ``pointer" is used generically, i.e., it is not a C pointer per se.
+You must use these macros in your implementation. Upon successful completion, llseek returns the resulting pointer location \emph{as measured in bytes from the beginning of the file}. Otherwise, -1 is returned, the file pointer remains unchanged. Here, ``pointer" is used generically, i.e., it is not a C pointer per se.
 
-\item In addition to implementing these functions, your device driver must also print the number of times that the device has been opened to the kernel log.
+- In addition to implementing these functions, your device driver must also print the number of times that the device has been opened to the kernel log.
 
-\end{enumerate}
 To see more info on these system calls, visit their man pages. Your task is to give an implementation of the five aforementioned functions. You must name your functions:
-\begin{center}
-\begin{verbatim}
+```
 my_read, my_write, my_llseek, my_open, my_release
-\end{verbatim}
-\end{center}
+```
+
 
 \subsubsection*{Hints}
 \begin{itemize}
