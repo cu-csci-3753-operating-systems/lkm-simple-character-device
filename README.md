@@ -229,4 +229,4 @@ Implement `write`, then `read`.
 
 Implement `llseek`
 	
-For testing your device driver, you should modify the `seek` lab code so that you can monitor the contents of your device driver's buffer from userland. 
+For testing your device driver, you should modify the `seek` lab code so you can monitor the content of your device driver's buffer from user space
