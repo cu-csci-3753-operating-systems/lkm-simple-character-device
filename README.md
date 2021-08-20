@@ -14,7 +14,7 @@ But from our readings, we know that we can also add code to the Linux kernel <i>
 
 The kernel isolates certain functions, including the modules (LKMs), especially well and therefore they don't have to be intricately wired into the rest of the kernel. The part of the kernel that is bound into the image that you boot (i.e., all of the kernel except the LKMs) is called the \emph{base kernel}. LKMs communicate with the base kernel. There is a tendency to think of LKMs like user space programs. Modules do share a lot of user space program properties, but LKMs are definitely not user space programs. LKMs (when loaded) are very much part of the kernel. As such, they have free run of the system and can easily crash it.
 
-\noindent LKMs have several advantages:
+LKMs have several advantages:
 
 - You don't have to rebuild your kernel.
 - LKMs help you diagnose system problems. A bug in a device driver which is bound into the kernel can stop your system from booting at all.
@@ -25,13 +25,13 @@ The kernel isolates certain functions, including the modules (LKMs), especially 
 In summary, LKMs are object files used to extend a running kernel's functionality. This is basically a piece of machine code that can be inserted and installed in the kernel on the fly without the need to reboot. This is very handy when you are trying to work with some new device and will be repeatedly be writing and testing your code. It is very convenient to write system code, install it, test it, and then uninstall it, without ever needing to reboot the system.
 
 ### Writing Source Code for a New Device Driver
-Recall that the kernel uses \emph{jump tables} in order to call the correct device drivers and functions of those drivers. Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. We will create a new module \texttt{helloworld} that will log the functions being called. In Moodle you should find the \texttt{hellomodule.c} file. Create a new directory called \texttt{helloworld} in the \texttt{/home/kernel/} directory. Open the \texttt{hellomodule.c} file in your editor.
+Recall that the kernel uses \emph{jump tables} in order to call the correct device drivers and functions of those drivers. Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. We will create a new module `helloworld` that will log the functions being called. In Moodle you should find the `hellomodule.c` file. Create a new directory called `helloworld` in the `/home/kernel/` directory. Open the `hellomodule.c` file in your editor.
 
-This simple source file has all the code needed to install and uninstall an LKM in the kernel. There are two macros listed at the bottom of the source file that setup the jump table for this LKM. Whenever the module is installed, the kernel will call the routine specified in the \texttt{module\_init} macro, and the routine specified in the \texttt{module\_exit} will be called when the module is uninstalled.
+This simple source file has all the code needed to install and uninstall an LKM in the kernel. There are two macros listed at the bottom of the source file that setup the jump table for this LKM. Whenever the module is installed, the kernel will call the routine specified in the `module_init` macro, and the routine specified in the `module_exit` will be called when the module is uninstalled.
 
 ### Compiling Source Code for a New Device Driver
 
-Let's now compile the module. There are a couple of ways to add our module to the list of modules to be built for a kernel. One is to modify the makefile used by the kernel build. The other is to write our own local makefile and attach it to the build when we want to make the modules. The latter is a bit safer, so what we'll do is create a new file called \texttt{Makefile} in the \texttt{/home/kernel/helloworld} directory, then type the following lines in the file:
+Let's now compile the module. There are a couple of ways to add our module to the list of modules to be built for a kernel. One is to modify the makefile used by the kernel build. The other is to write our own local makefile and attach it to the build when we want to make the modules. The latter is a bit safer, so what we'll do is create a new file called `Makefile` in the `/home/kernel/helloworld` directory, then type the following lines in the file:
 
 ```
 obj-m:= hellomodule.o
@@ -42,30 +42,29 @@ clean:
 	make -C /lib/modules/$(shell uname -r)/build M=/home/kernel/helloworld modules
 ```
 
-Here, `obj-m` means that we are creating a module \texttt{hellomodule.o} from the source code file \texttt{hellomodule.c}, thus \texttt{hellomodule.c} should be in the same directory as your \texttt{Makefile}. In the \texttt{/home/kernel/helloworld} directory, run the following command:
-\begin{verbatim}
+Here, `obj-m` means that we are creating a module \texttt{hellomodule.o} from the source code file `hellomodule.c`, thus `hellomodule.c` should be in the same directory as your `Makefile`. In the `/home/kernel/helloworld` directory, run the following command:
+```
 make
-\end{verbatim}
-You should now see the kernel object code \texttt{hellomodule.ko} in that directory.  In the following section, we will learn how to install our module into the kernel, then uninstall the module from the kernel.
-\subsection{Installing/Uninstalling LKMs}
+```
+You should now see the kernel object code `hellomodule.ko` in that directory.  In the following section, we will learn how to install our module into the kernel, then uninstall the module from the kernel.
+### Installing/Uninstalling LKMs
 
-To insert (install) the module, type the following command:
-\begin{verbatim}
+To insert the module, type the following command:
+```
 sudo insmod hellomodule.ko
-\end{verbatim}
-The kernel has tried to insert your module. If it is successful, the \texttt{module\_init()} function will be called and you will see the log message that has been inserted into \texttt{/val/logs/system.log}. If you type \texttt{lsmod} you will see your module is now inserted in the kernel.
+```
+The kernel has tried to insert your module. If it is successful, the `module_init()` function will be called and you will see the log message that has been inserted into `/var/logs/system.log`. If you type `lsmod` you will see your module is now inserted in the kernel.
 
-
-\noindent Let's now uninstall the module from the kernel by using the following command:
-\begin{verbatim}
+Let's now uninstall the module from the kernel by using the following command:
+```
 sudo rmmod hellomodule
-\end{verbatim}
-To verify that the module was uninstalled, check the system log and you should see our module exit message. You can also use the \texttt{lsmod} command to verify the module is no longer in the system.
+```
+To verify that the module was uninstalled, check the system log and you should see our module exit message. You can also use the `lsmod` command to verify the module is no longer in the system.
 
 
 
 
-\subsection{Creating a Virtual File for the Device}
+## Creating a Virtual File for the Device
 
 
 We know that device drivers can be dynamically installed into the kernel, but how does the kernel know which device driver to use with which device? 
@@ -94,20 +93,19 @@ which we will discuss in more detail momentarily.
 Immediately, we observe that a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. In your previous courses, you have more than likely encountered many sophisticated implementations of buffers.  For this assignment we will not be concerned about such implementations. The buffer should be an array of 1024 characters.  In the next section, we discuss how we \emph{register} our device driver.
 
 
-\subsection{Registering/Unregistering the Device Driver}
+## Registering/Unregistering the Device Driver
 Recall that each device's virtual file is created with a major number associated with it, which allows the kernel to find the code that has been assigned to the major number when an applications tries to perform file operations upon it.
-This means that when a module is loaded, it needs to tell the kernel which device it will be supporting by associating a major number with the module. Since our device is a character device, this can be accomplished using the \texttt{register\_chrdev()} function, whose prototype is stated below:
-\begin{lstlisting}
+This means that when a module is loaded, it needs to tell the kernel which device it will be supporting by associating a major number with the module. Since our device is a character device, this can be accomplished using the `register_chrdev()` function, whose prototype is stated below:
+```
 int register_chrdev (unsigned int  major, 
 			const char *  name, 
 			const struct file_operations * fops);
-\end{lstlisting}
-Its first argument is self-explanatory, as is the second (recall that we called our virtual file ``simple\_character\_device", so we could pass that as our string).  
-The third parameter deserves a proper discussion which we will get to momentarily. We also need to unregister our device driver if we decide to unload the kernel module.  This is accomplished with the \texttt{unregister\_chrdev(unsigned int major, const char* name)} function.
+```
+Its first argument is self-explanatory, as is the second (recall that we called our virtual file `simple_character_device`, so we could pass that as our string).  
+The third parameter deserves a proper discussion which we will get to momentarily. We also need to unregister our device driver if we decide to unload the kernel module.  This is accomplished with the `unregister_chrdev(unsigned int major, const char* name)` function.
 
 
-
-Below is the definition of the somewhat involved \texttt{file\_operations} struct:
+Below is the definition of the somewhat involved `file_operations` struct:
 ```
 struct file_operations {
        struct module* owner;
@@ -215,9 +213,13 @@ However, to properly test \texttt{llseek()}, \emph{you will need to write your o
 For submitting this assignment, create a zip file (use filename: $<$your last name$>$\_PA1.zip) with all the files you have modified to create your new device driver. Submit that zip file as your submission in Moodle.
 
 
-\subsection{Grading}
+## Grading
 
-\emph{If your final submission does not compile, then you cannot earn more than a 30, so be sure that you submit code that compiles.} Your program will be evaluated as follows: 
+Recall that 5 points of your assignment are determined by weekly updates. The remaining 95 points are determined by the grading script `test.py` which outputs how many of the 95 points you earned.
+
+
+
+	
 
 \begin{itemize}
 \item  \texttt{open}, \texttt{release}, and successfully installing the device driver as LKM (25\%) 
