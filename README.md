@@ -176,7 +176,6 @@ To see more info on these system calls, visit their man pages. Your task is to g
 my_read, my_write, my_llseek, my_open, my_release
 ```
 
-
 ### Hints
 
 - If you are having trouble getting started, use \texttt{helloworld.c} as a starting point. 
@@ -191,6 +190,7 @@ instead of acting on \texttt{filp->f\_pos} directly. The one exception to this r
 
  - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for our assignment).
 
+- For testing your device driver, you should modify the `seek` lab code so you can monitor the content of your device driver's buffer from user space. It is possible for read, write, and seek to appear functional in your `C` test code, but not interface properly with unix system utilities such as `echo`, `tail`, `head`, and so on. This means your implementation is incorrect, so be sure that your code interfaces with these utilities. Recall that `strace` allows you to see how these utilities are interfacing with your device. 
 
 \subsection{Testing}
 
@@ -225,4 +225,4 @@ Implement `write`, then `read`.
 
 Implement `llseek`. You cannot earn more than 80/95 if you do not attempt `llseek`.
 	
-For testing your device driver, you should modify the `seek` lab code so you can monitor the content of your device driver's buffer from user space
+
