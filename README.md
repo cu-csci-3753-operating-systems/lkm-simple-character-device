@@ -1,8 +1,10 @@
 # A Simple Character Device LKM
 
+Your task is to implement a LKM device driver for a simple character device that supports reading, writing, and seeking. This assignment builds off the system call lab, so you are advised to complete that lab before beginning this assignment.
+
 ## Creating Your Own Device Driver
 
-If you want to add code to a Linux kernel, the usual method is to add some source files to the kernel source tree and recompile the kernel. This is what you did in the system call lab. After each change, the kernel must be recompiled, copied into the boot directory, and the computer must be rebooted. Again, you did this repeatedly in the system call lab. After you copied the kernel to the boot partition and rebooted, the changes that you made were installed in the kernel. If anything needed to be changed, this required you to repeat the whole process again. As you know from experience, this is tedious and inefficient.
+Recall that if you want to add code to a Linux kernel, the usual method is to add some source files to the kernel source tree and recompile the kernel. This is what you did in the system call lab. After each change, the kernel must be recompiled, copied into the boot directory, and the computer must be rebooted. Again, you did this repeatedly in the system call lab. After you copied the kernel to the boot partition and rebooted, the changes that you made were installed in the kernel. If anything needed to be changed, this required you to repeat the whole process again. As you know from experience, this is tedious and inefficient.
 
 ### Building Loadable Kernel Modules (LKMs)
 
@@ -223,6 +225,6 @@ Implement `write`, then `read`.
 
 ### Checkpoint 3
 
-Implement `llseek`
+Implement `llseek`. You cannot earn more than 80/95 if you do not attempt `llseek`.
 	
 For testing your device driver, you should modify the `seek` lab code so you can monitor the content of your device driver's buffer from user space
