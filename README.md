@@ -215,19 +215,16 @@ For submitting this assignment, create a zip file (use filename: $<$your last na
 
 ## Grading
 
-Recall that 5 points of your assignment are determined by weekly updates. The remaining 95 points are determined by the grading script `test.py` which outputs how many of the 95 points you earned.
-
-
-
+Recall that 5 points of your assignment are determined by weekly updates. The remaining 95 points are determined by the grading script `test.py` which outputs how many of the 95 points you have earned. To ensure that you maximize your score on this assignment, you should write your assignment with respect to the following checkpoints.
 	
+### Checkpoint 1
 
-\begin{itemize}
-\item  \texttt{open}, \texttt{release}, and successfully installing the device driver as LKM (25\%) 
-\item  \texttt{read} and \texttt{write} (25\%) 
-\item  \texttt{llseek} (25\%)
-\item a test program that tests the functionality of these five operations (25\%).
-\end{itemize}
-Your test program should cover typical use cases as well as edge cases, e.g., trying to write beyond the buffer.  
-Partial credit (TBD) will be awarded if these parts are not 100\% correct.
+Successfully install/uninstall device driver as LKM, then implement `open` and `release`. 
+	
+### Checkpoint 2
 
+Implement `write`, then `read`.
 
+### Checkpoint 3
+
+Implement `llseek`
