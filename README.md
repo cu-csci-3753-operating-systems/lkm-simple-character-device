@@ -71,15 +71,15 @@ To verify that the module was uninstalled, check the system log and you should s
 
 We know that device drivers can be dynamically installed into the kernel, but how does the kernel know which device driver to use with which device? 
 
-Each device will have a corresponding device file that is located in the \texttt{/dev} directory. If you list the files in that directory you will see all the devices currently known by the kernel. These are not regular files, they are \emph{virtual files} that only supply data from or give data to the device. There is not any physical storage on the disk for these devices like the files that we are used to. The device driver code is responsible for creating a mechanism to store all the information.
+Each device will have a corresponding device file that is located in the `/dev` directory. If you list the files in that directory you will see all the devices currently known by the kernel. These are not regular files, they are \emph{virtual files} that only supply data from or give data to the device. There is not any physical storage on the disk for these devices like the files that we are used to. The device driver code is responsible for creating a mechanism to store all the information.
 
-To add a new device you need to create a new entry in the \texttt{/dev} directory. Each virtual file has information associated with it to tell the kernel which device driver to use when accessing the device. Recall that in Linux, each device driver is given a device \emph{major number} to uniquely identify it.
+To add a new device you need to create a new entry in the `/dev` directory. Each virtual file has information associated with it to tell the kernel which device driver to use when accessing the device. Recall that in Linux, each device driver is given a device \emph{major number} to uniquely identify it.
 
-You can create a new virtual device file to be associated with your device driver. First, we'll find an unused major number for your kernel, then we'll use the \texttt{mknod} command to create a new device entry and associate the new major number for your device driver. 
+You can create a new virtual device file to be associated with your device driver. First, we'll find an unused major number for your kernel, then we'll use the `mknod` command to create a new device entry and associate the new major number for your device driver. 
 ```
 sudo mknod  <location> <type of driver> <major number> <minor number>
 ```
-The major number should be unique and you can look at current devices already installed, but usually user modules start at 240.  The \emph{minor number} can be 0. The type of our driver should be \texttt{c} for character. Note that more sophisticated drivers must deal with blocks of arbitrary data, in which case the type is \texttt{b} (see \texttt{man mknod} for more details).  Putting it all together, run the following command:
+The major number should be unique and you can look at current devices already installed, but usually user modules start at 240.  The \emph{minor number} can be 0. The type of our driver should be `c` for character. Note that more sophisticated drivers must deal with blocks of arbitrary data, in which case the type is `b` (see `man mknod` for more details).  Putting it all together, run the following command:
 ```
 sudo mknod /dev/simple_character_device c 240 0
 ```
@@ -92,7 +92,7 @@ Using \texttt{hellomodule.c} as template, in a new \texttt{C} file \texttt{my\_d
 open, read, write, llseek, release
 ```
 which we will discuss in more detail momentarily.
-Immediately, we observe that a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. In your previous courses, you have more than likely encountered many sophisticated implementations of buffers.  For this assignment we will not be concerned about such implementations. The buffer should be an array of 1024 characters.  In the next section, we discuss how we \emph{register} our device driver.
+Immediately, we observe that a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. In your previous courses, you have more than likely encountered many sophisticated implementations of buffers.  For this assignment we will not be concerned about such implementations. The buffer should be an array of `1024` characters.  In the next section, we discuss how we \emph{register} our device driver.
 
 
 ## Registering/Unregistering the Device Driver
@@ -103,8 +103,7 @@ int register_chrdev (unsigned int  major,
 			const char *  name, 
 			const struct file_operations * fops);
 ```
-Its first argument is self-explanatory, as is the second (recall that we called our virtual file `simple_character_device`, so we could pass that as our string).  
-The third parameter deserves a proper discussion which we will get to momentarily. We also need to unregister our device driver if we decide to unload the kernel module.  This is accomplished with the `unregister_chrdev(unsigned int major, const char* name)` function.
+Its first argument is self-explanatory, as is the second (recall that we called our virtual file `simple_character_device`, so we could pass that as our string).  The third parameter deserves a proper discussion which we will get to momentarily. We also need to unregister our device driver if we decide to unload the kernel module.  This is accomplished with the `unregister_chrdev(unsigned int major, const char* name)` function.
 
 
 Below is the definition of the somewhat involved `file_operations` struct:
@@ -131,9 +130,9 @@ struct file_operations {
 Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is our responsibility to provide implementations of these operations (you can kind of think of this struct like a Java \texttt{interface} in that it specifies the functionality that we the programmer must implement).
 If we do not provide an implementation of any one of these functions, then the corresponding member is set to \texttt{0} by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.
 
-You might have also noticed the \texttt{\_t} suffix naming convention.  This stands for ``type" and it is our makeshift \texttt{C} way of announcing what kind of data we should be expecting. There are no objects in \texttt{C}, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of \texttt{read} should return a value of ``signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
+You might have also noticed the `_t` suffix naming convention.  This stands for ``type" and it is our makeshift \texttt{C} way of announcing what kind of data we should be expecting. There are no objects in \texttt{C}, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of `read` should return a value of ``signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
 
-For the purposes of this assignment, our file operations struct, that we will pass as an argument to \texttt{register\_chrdev()}, can be global and static. For example, if we were just worried about implementing \texttt{read}, then this declaration would look something like this:
+For the purposes of this assignment, our file operations struct, that we will pass as an argument to `register_chrdev()`, can be global and static. For example, if we were just worried about implementing `read`, then this declaration would look something like this:
 ```
 // recall that . is the member access operator in C
 static struct file_operations simple_driver_fops =
@@ -142,16 +141,15 @@ static struct file_operations simple_driver_fops =
     .read    = my_read,
 };
 ```
-where \texttt{my\_read} is a function that implements \texttt{read}.  The prototype of our read function should of course be:
+where `my_read` is a function that implements `read`.  The prototype of our read function should of course be:
 ```
 ssize_t my_read (struct file* , char* , size_t, loff_t* );
 ```
-\noindent The declaration of the \texttt{THIS\_MODULE} macro is contained in the \texttt{linux/module.h} header file. 
-
+The declaration of the `THIS_MODULE` macro is contained in the `linux/module.h` header file. 
 
 If we assign 0 to the major parameter, then the function will allocate a major device number (i.e. the value it returns) on its own, which allows us to not know in advance which major device numbers are taken.
 
-\subsection{Implementing a Character Device Driver}
+## Implementing a Character Device Driver
 
 The close functionality is handled by \texttt{release}. Since we are developing a very simple character device driver, many of the arguments to these functions that we need to implement will not be used.  Along these lines, do not overthink the \texttt{open} and \texttt{release} functions -- their implementations should be trivial. The nontrivial programming component of this assignment is the implementation of 
 \begin{enumerate}
@@ -179,21 +177,21 @@ my_read, my_write, my_llseek, my_open, my_release
 ```
 
 
-\subsubsection*{Hints}
-\begin{itemize}
-\item If you are having trouble getting started, use \texttt{helloworld.c} as a starting point. 
-\item You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages).
-\item Remember that your module lives in \emph{kernel space} but some arguments of our functions point to buffers in \emph{user space}. Check your notes to figure out how to get around this.
-\item Since we are implementing \texttt{llseek}, you will also need to keep track of the \emph{present position} in the buffer. You might find the \texttt{loff\_t} \texttt{f\_pos} field of the \texttt{file* filp}  struct useful for keeping track of this information. It represents the current reading or writing position. \texttt{loff\_t} is a 64-bit value on all platforms
+### Hints
+
+- If you are having trouble getting started, use \texttt{helloworld.c} as a starting point. 
+- You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages).
+- Remember that your module lives in \emph{kernel space} but some arguments of our functions point to buffers in \emph{user space}. Check your notes to figure out how to get around this.
+- Since we are implementing \texttt{llseek}, you will also need to keep track of the \emph{present position} in the buffer. You might find the \texttt{loff\_t} \texttt{f\_pos} field of the \texttt{file* filp}  struct useful for keeping track of this information. It represents the current reading or writing position. \texttt{loff\_t} is a 64-bit value on all platforms
 (\texttt{long long} in gcc terminology). The driver can read this value if it needs to know
 the current position in the file (i.e., your buffer). \texttt{read} and \texttt{write}
 should update the position using the pointer they receive as the last argument
 instead of acting on \texttt{filp->f\_pos} directly. The one exception to this rule is in the
 \texttt{llseek} method, the purpose of which is to change the file position.
 
- \href{https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html}{Click here} for more info about the \texttt{file} struct (even though the rest of its fields aren't that useful for our assignment).
+ - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for our assignment).
 
-\end{itemize}
+
 \subsection{Testing}
 
 We can do some ``quick and dirty" testing by doing I/O redirection in the terminal as follows:
