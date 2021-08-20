@@ -181,12 +181,9 @@ my_read, my_write, my_llseek, my_open, my_release
 - If you are having trouble getting started, use \texttt{helloworld.c} as a starting point. 
 - You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages).
 - Remember that your module lives in \emph{kernel space} but some arguments of our functions point to buffers in \emph{user space}. Check your notes to figure out how to get around this.
-- Since we are implementing \texttt{llseek}, you will also need to keep track of the \emph{present position} in the buffer. You might find the \texttt{loff\_t} \texttt{f\_pos} field of the \texttt{file* filp}  struct useful for keeping track of this information. It represents the current reading or writing position. \texttt{loff\_t} is a 64-bit value on all platforms
-(\texttt{long long} in gcc terminology). The driver can read this value if it needs to know
-the current position in the file (i.e., your buffer). \texttt{read} and \texttt{write}
-should update the position using the pointer they receive as the last argument
-instead of acting on \texttt{filp->f\_pos} directly. The one exception to this rule is in the
-\texttt{llseek} method, the purpose of which is to change the file position.
+- Since we are implementing `llseek`, you will also need to keep track of the <i>present position</i> in the buffer. You might find the `loff_t f_pos` field of the `file* filp` struct useful for keeping track of this information. It represents the current reading or writing position. `loff_t` is a 64-bit value on all platforms
+(`long long` in gcc terminology). The driver can read this value if it needs to know the current position in the file (i.e., your buffer). `read` and `write`
+should update the position using the pointer they receive as the last argument instead of acting on `filp->f_pos` directly. The one exception to this rule is in the `llseek` method, the purpose of which is to change the file position.
 
  - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for our assignment).
 
@@ -204,8 +201,9 @@ cat /dev/simple_character_device
 ```
 However, to properly test \texttt{llseek()}, \emph{you will need to write your own test program} in \texttt{C} to test it. Remember, our character device is a \emph{file}, so we can use familiar file I/O operations (e.g., \texttt{fopen}, \texttt{fclose}, \texttt{fseek}, etc..) for creating our test program. Your test program should also test the functionality of \texttt{read} and \texttt{write}. You are free to consult your notes or online tutorials about file I/O in \texttt{C}.
 
-\subsection{Submission Instructions}
+## Submission Instructions
 
+You must follow these instructions carefully; otherwise, your solution will not interface with the grading script `test.py` and you will lose many points.
 For submitting this assignment, create a zip file (use filename: $<$your last name$>$\_PA1.zip) with all the files you have modified to create your new device driver. Submit that zip file as your submission in Moodle.
 
 
