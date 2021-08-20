@@ -182,8 +182,7 @@ my_read, my_write, my_llseek, my_open, my_release
 - You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages).
 - Remember that your module lives in \emph{kernel space} but some arguments of our functions point to buffers in \emph{user space}. Check your notes to figure out how to get around this.
 - Since we are implementing `llseek`, you will also need to keep track of the <i>present position</i> in the buffer. You might find the `loff_t f_pos` field of the `file* filp` struct useful for keeping track of this information. It represents the current reading or writing position. `loff_t` is a 64-bit value on all platforms
-(`long long` in gcc terminology). The driver can read this value if it needs to know the current position in the file (i.e., your buffer). `read` and `write`
-should update the position using the pointer they receive as the last argument instead of acting on `filp->f_pos` directly. The one exception to this rule is in the `llseek` method, the purpose of which is to change the file position.
+(`long long` in gcc terminology). The driver can read this value if it needs to know the current position in the file (i.e., your buffer). However, `read` and `write` should update the position using the pointer they receive as the last argument instead of acting on `filp->f_pos` directly. The purpose of the `llseek` method is to change the file position, which is why it will be modifying `filp->f_pos` directly.
 
  - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for our assignment).
 
