@@ -237,7 +237,7 @@ Implement `write`, then `read`.
 
 ### Checkpoint 3
 
-Implement `llseek`. You cannot earn more than 80/95 if you do not attempt `llseek`.
+Implement `llseek`. You cannot earn more than 70/95 if you do not attempt `llseek`.
 
 ## References
 
