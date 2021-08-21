@@ -150,6 +150,9 @@ If we assign 0 to the major parameter, then the function will allocate a major d
 The close functionality is handled by `release`. Since we are developing a very simple character device driver, many of the arguments to these functions that we need to implement will not be used.  Along these lines, do not overthink the `open` and `release` functions -- their implementations should be trivial. The nontrivial programming component of this assignment is the implementation of 
 
 - `read` and `write`: The first parameter is a pointer to file structure. The second parameter is a pointer to a <i>data buffer</i>. Note that these buffers will be different depending on whether we are reading or writing. The third parameter is the size of data to be read or written in bytes. The fourth parameter is a pointer to 64 bit current byte offset. The return value is the number of bytes actually read/written. Otherwise, -1 is returned. You should return -1 for example if the user attempts to write beyond the buffer. On the other hand, you should return 0 if the user attempts to start reading beyond the buffer. Here, returning 0 indicates we have arrived at the ``end of the file". 
+
+![Screen Shot 2021-08-20 at 9 49 40 PM](https://user-images.githubusercontent.com/5934852/130309684-6dee23b4-af95-40e2-bd74-a72118cbb9c3.png)
+
 - `llseek`: (man entry excerpt below)
 ```
 #include <sys/types.h>
@@ -163,7 +166,7 @@ The ``llseek`` function sets the 64-bit extended file pointer associated with th
 - If whence is `SEEK_CUR`, the pointer is set to its current location plus offset.
 - If whence is `SEEK_END`, the pointer is set to the size of the file plus offset.
 
-You must use these macros in your implementation. Upon successful completion, `llseek` returns the resulting pointer location <i>as measured in bytes from the beginning of the file</i>. Otherwise, -1 is returned, the file pointer remains unchanged (here, `"pointer" is used generically, i.e., it is not a C pointer per se).
+You must use these macros in your implementation. Upon successful completion, `llseek` returns the resulting pointer location <i>as measured in bytes from the beginning of the file</i>. Otherwise, -1 is returned, the file pointer remains unchanged (here, "pointer" is used generically, i.e., it is not a C pointer per se).
 
 - In addition to implementing these functions, your device driver must also print the number of times that the device has been opened to the kernel log.
 
@@ -178,7 +181,7 @@ my_read, my_write, my_llseek, my_open, my_release
 - You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages). They will all be of the form `#include <linux/*.h>`.
 - Remember that your module lives in <i>kernel space</i> but some arguments of our functions point to buffers in <i>user space</i>.
 - Since we are implementing `llseek`, you will also need to keep track of the <i>present position</i> in the buffer. The `loff_t f_pos` field of the `file* filp` struct is essential for keeping track of this information. It represents the current reading or writing position. `loff_t` is a 64-bit value on all platforms
-(`long long` in gcc terminology). The driver can read this value if it needs to know the current position in the file (i.e., your buffer). However, `read` and `write` should update the position using the pointer they receive as the last argument instead of acting on `filp->f_pos` directly. The purpose of the `llseek` method is to change the file position, which is why it will be modifying `filp->f_pos` directly.
+(`long long` in gcc terminology). The driver can read this value if it needs to know the current position in the file (i.e., your buffer). However, `read` and `write` should update the position using the pointer they receive as the last argument instead of acting on `filp->f_pos` directly. The purpose of the `llseek` method is to change the file position, which is why it will be modifying `filp->f_pos` directly.![Screen Shot 2021-08-20 at 9 47 09 PM](https://user-images.githubusercontent.com/5934852/130309612-8248b408-9e63-44f0-8249-5f3a5639fc6d.png)
 
  - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for our assignment).
 
