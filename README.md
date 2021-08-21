@@ -183,7 +183,7 @@ loff_t(*llseek) (structfile *filp, loff_t offset, int whence);
 	- If `whence` is `SEEK_SET`, the cursor is set to `offset` bytes.
 	- If `whence` is `SEEK_CUR`, the cursor is set to its current location plus `offset`.
 	- If `whence` is `SEEK_END`, the cursor is set to the size of the file plus `offset`.
-You must use these macros in your implementation. If adding the offset causes the cursor to become negative, then `-EINVAL` is returned, and the curstor remains unchanged.
+You must use these macros in your implementation. If adding the offset causes the cursor to become negative, then `-EINVAL` (invalid value) is returned, and the cursor remains unchanged.
 
 
 ### Hints
