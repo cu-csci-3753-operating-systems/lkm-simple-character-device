@@ -145,6 +145,10 @@ If we assign 0 to the major parameter, then the function will allocate a major d
 
 ## Implementing a Character Device Driver
 
+Your main task is to give an implementation of five functions: `read`, `write`, `llseek`, `open`, `release`. You must name your functions:
+```
+my_read, my_write, my_llseek, my_open, my_release
+```
 The close functionality is handled by `release`. Since we are developing a very simple character device driver, many of the arguments to these functions that we need to implement will not be used.  Along these lines, do not overthink the `open` and `release` functions -- their implementations should be trivial. The nontrivial programming component of this assignment is the implementation of the following functions.
 
 ### `read` and `write`
@@ -160,38 +164,27 @@ The return value for `read` is interpreted by the calling application program as
 - If the value equals the `count` argument passed to the read system call, the requested number of bytes has been transferred. This is the optimal case.
 - If the value is positive, but smaller than `count`, only part of the data has been transferred. This may happen for a number of reasons, depending on the device. Most often, the application program retries the read. For instance, if you read using the `fread` function, the library function reissues the system call until completion of the requested data transfer. You can also see this behavior when you do a `strace` of `cat`.
 - If the value is 0 , end-of-file was reached (and no data was read).
-- A negative value means there was an error. The value specifies what the error was, according to `<linux/errno.h>`. Typical values returned on error include `-EINTR`
-(interrupted system call) or `-EFAULT` (bad address).
+- A negative value means there was an error. The value specifies what the error was, according to `<linux/errno.h>`. Typical values returned on error include `-EINTR` (interrupted system call) or `-EFAULT` (bad address). For our LKM, the latter should be returned if any of the system calls invoked in `read` or `write` throws an error.
 
 The return value for `write` is interpreted by the calling application program as follows:
 - If the value equals `count`, the requested number of bytes has been transferred.
 - If the value is positive, but smaller than `count`, only part of the data has been transferred. The program will most likely retry writing the rest of the data.
-- If the value is 0, nothing was written. This result is not an error, and there is no reason to return an error code. Once again, the standard library retries the call to write. 
-- A negative value means an error occurred; as for read, valid error values are those defined in `<linux/errno.h>`.
+- If the value is 0, nothing was written. This result is not an error, and there is no reason to return an error code. Once again, the standard library retries the call to `write`. 
+- A negative value means an error occurred; as for `read`, valid error values are those defined in `<linux/errno.h>`.
 
 ### `llseek`
-
-- `llseek`: (man entry excerpt below)
+The `llseek function` is called when one moves the cursor position within a file. The entry point of this method in user space is `lseek()`. One can refer to the `man` page in order to print the full description of either method from user space: `man llseek` and `man lseek`. Its prototype looks as follows:
 ```
-#include <sys/types.h>
-#include <unistd.h>
-
-offset_t llseek(int fildes, offset_t offset, int whence);
+loff_t(*llseek) (structfile *filp, loff_t offset, int whence);
 ```
-The ``llseek`` function sets the 64-bit extended file pointer associated with the open file descriptor specified by fildes as follows:
+- The return value is the new position in the file
+- `loff_t` is an offset, relative to the current file position, which defines how much it will be changed
+- `whence` defines where to seek from. In particular,
+	- If `whence` is `SEEK_SET`, the cursor is set to `offset` bytes.
+	- If `whence` is `SEEK_CUR`, the cursor is set to its current location plus `offset`.
+	- If `whence` is `SEEK_END`, the cursor is set to the size of the file plus `offset`.
+You must use these macros in your implementation. If adding the offset causes the cursor to become negative, then `-EINVAL` is returned, and the curstor remains unchanged.
 
-- If `whence` is `SEEK_SET`, the pointer is set to offset bytes.
-- If `whence` is `SEEK_CUR`, the pointer is set to its current location plus offset.
-- If `whence` is `SEEK_END`, the pointer is set to the size of the file plus offset.
-
-You must use these macros in your implementation. Upon successful completion, `llseek` returns the resulting pointer location <i>as measured in bytes from the beginning of the file</i>. Otherwise, -1 is returned, the file pointer remains unchanged (here, "pointer" is used generically, i.e., it is not a C pointer per se).
-
-- In addition to implementing these functions, your device driver must also print the number of times that the device has been opened to the kernel log.
-
-To see more info on these system calls, visit their man pages. Your task is to give an implementation of the five aforementioned functions. You must name your functions:
-```
-my_read, my_write, my_llseek, my_open, my_release
-```
 
 ### Hints
 
@@ -249,4 +242,5 @@ Implement `llseek`. You cannot earn more than 80/95 if you do not attempt `llsee
 ## References
 
 [1] Daniel Bovet and Marco Cesati. 2005. <i>Understanding The Linux Kernel</i>. Oreilly & Associates Inc.
+[2] John Madieu. 2017. <i>Linux Device Drivers Development: Develop customized drivers for embedded Linux</i>. Packt Publishing.
 
