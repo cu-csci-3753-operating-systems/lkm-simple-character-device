@@ -242,5 +242,6 @@ Implement `llseek`. You cannot earn more than 80/95 if you do not attempt `llsee
 ## References
 
 [1] Daniel Bovet and Marco Cesati. 2005. <i>Understanding The Linux Kernel</i>. Oreilly & Associates Inc.
+
 [2] John Madieu. 2017. <i>Linux Device Drivers Development: Develop customized drivers for embedded Linux</i>. Packt Publishing.
 
