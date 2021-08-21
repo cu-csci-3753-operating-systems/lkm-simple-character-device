@@ -171,6 +171,7 @@ The return value for `write` is interpreted by the calling application program a
 - If the value is positive, but smaller than `count`, only part of the data has been transferred. The program will most likely retry writing the rest of the data.
 - If the value is 0, nothing was written. This result is not an error, and there is no reason to return an error code. Once again, the standard library retries the call to `write`. 
 - A negative value means an error occurred; as for `read`, valid error values are those defined in `<linux/errno.h>`.
+- If the buffer is filled and an attempt is made to write beyond the last position, then `write` must return -1 to indicate this error.
 
 ### `llseek`
 The `llseek function` is called when one moves the cursor position within a file. The entry point of this method in user space is `lseek()`. One can refer to the `man` page in order to print the full description of either method from user space: `man llseek` and `man lseek`. Its prototype looks as follows:
