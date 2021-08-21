@@ -163,7 +163,7 @@ The ``llseek`` function sets the 64-bit extended file pointer associated with th
 - If whence is `SEEK_CUR`, the pointer is set to its current location plus offset.
 - If whence is `SEEK_END`, the pointer is set to the size of the file plus offset.
 
-You must use these macros in your implementation. Upon successful completion, `llseek` returns the resulting pointer location \emph{as measured in bytes from the beginning of the file}. Otherwise, -1 is returned, the file pointer remains unchanged (here, `"pointer" is used generically, i.e., it is not a C pointer per se).
+You must use these macros in your implementation. Upon successful completion, `llseek` returns the resulting pointer location <i>as measured in bytes from the beginning of the file</i>. Otherwise, -1 is returned, the file pointer remains unchanged (here, `"pointer" is used generically, i.e., it is not a C pointer per se).
 
 - In addition to implementing these functions, your device driver must also print the number of times that the device has been opened to the kernel log.
 
