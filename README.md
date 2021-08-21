@@ -126,9 +126,9 @@ struct file_operations {
 Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is our responsibility to provide implementations of these operations (you can kind of think of this struct like a Java interface in that it specifies the functionality that we the programmer must implement).
 If we do not provide an implementation of any one of these functions, then the corresponding member is set to NULL by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.
 
-You might have also noticed the `_t` suffix naming convention.  This stands for ``type" and it is our makeshift C way of announcing what kind of data we should be expecting. There are no objects in C, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of `read` should return a value of "signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
+You might have also noticed the `_t` suffix naming convention.  This stands for "type" and it is our makeshift C way of announcing what kind of data we should be expecting. There are no objects in C, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of `read` should return a value of "signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
 
-For the purposes of this assignment, our file operations struct, that we will pass as an argument to `register_chrdev()`, can be global and static. For example, if we were just worried about implementing `read`, then this declaration would look something like this:
+For the purposes of this assignment, our file operations struct, that we will pass as an argument to `register_chrdev()`, can be global and static. For example, if we were just concerned about implementing `read`, then this declaration would look something like this:
 ```
 // recall that . is the member access operator in C
 static struct file_operations simple_driver_fops =
