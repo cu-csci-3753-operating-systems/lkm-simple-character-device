@@ -179,9 +179,9 @@ my_read, my_write, my_llseek, my_open, my_release
 ### Hints
 
 - If you are having trouble getting started, use \texttt{helloworld.c} as a starting point. 
-- You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages).
-- Remember that your module lives in \emph{kernel space} but some arguments of our functions point to buffers in \emph{user space}. Check your notes to figure out how to get around this.
-- Since we are implementing `llseek`, you will also need to keep track of the <i>present position</i> in the buffer. You might find the `loff_t f_pos` field of the `file* filp` struct useful for keeping track of this information. It represents the current reading or writing position. `loff_t` is a 64-bit value on all platforms
+- You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages). They will all be of the form `#include <linux/*.h>`.
+- Remember that your module lives in <i>kernel space</i> but some arguments of our functions point to buffers in <i>user space</i>.
+- Since we are implementing `llseek`, you will also need to keep track of the <i>present position</i> in the buffer. The `loff_t f_pos` field of the `file* filp` struct is essential for keeping track of this information. It represents the current reading or writing position. `loff_t` is a 64-bit value on all platforms
 (`long long` in gcc terminology). The driver can read this value if it needs to know the current position in the file (i.e., your buffer). However, `read` and `write` should update the position using the pointer they receive as the last argument instead of acting on `filp->f_pos` directly. The purpose of the `llseek` method is to change the file position, which is why it will be modifying `filp->f_pos` directly.
 
  - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for our assignment).
@@ -200,7 +200,7 @@ which will write ``hello world" to our character device driver.
 ```
 cat /dev/simple_character_device
 ```
-- To partially test `llseek` functionality you may use the `tail` system utility. In particular, you may look at `test.py` to see other test cases that will be used to test your code. To thoroughly test \texttt{llseek()} you will need to write your own test program in C by modifying the `seek` lab. Remember, our character device is a <i>file</i>, so we can use familiar file I/O operations (e.g., `fopen`, `fclose`, `fseek`, etc..) for creating our test program. You are free to consult your notes or online tutorials about file I/O in C.
+- To partially test `llseek` functionality you may use the `tail` system utility. In particular, you may look at `test.py` to see other test cases that will be used to test your code. To thoroughly test `llseek` you will need to write your own test program in C by modifying the `seek` lab. Remember, our character device is a <i>file</i>, so we can use familiar file I/O operations (e.g., `fopen`, `fclose`, `fseek`, etc..) for creating our test program. You are free to consult your notes or online tutorials about file I/O in C.
 
 ## Submission Instructions
 
