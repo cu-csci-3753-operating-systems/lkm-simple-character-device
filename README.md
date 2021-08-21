@@ -226,7 +226,7 @@ For submitting this assignment, create a zip file (use filename `<your last name
 
 ## Grading
 
-Recall that 5 points of your assignment are determined by weekly updates. The remaining 95 points are determined by the grading script `test.py` which outputs how many of the 95 points you have earned. To ensure that you maximize your score on this assignment, you should write your assignment with respect to the following checkpoints.
+Recall that 5 points of your assignment are determined by weekly updates. The remaining 95 points are determined by the grading script `test.py` which outputs an estimate on how many of the 95 points you have earned (I will still read your programs to determine when partial credit can be awarded). You are encouraged to look at the grading script to understand how your solution will be evaluated. To ensure that you maximize your score on this assignment, you should write your assignment with respect to the following checkpoints.
 	
 ### Checkpoint 1
 
@@ -234,7 +234,7 @@ Successfully install/uninstall device driver as LKM, then implement `open` and `
 	
 ### Checkpoint 2
 
-Implement `write`, then `read`.
+Implement `write`, then `read`. You cannot pass this assignment without correctly implementing `write` and `read`.
 
 ### Checkpoint 3
 
