@@ -14,22 +14,20 @@ But from our readings, we know that we can also add code to the Linux kernel <i>
 - filesystem drivers, and
 - system calls.
 
-The kernel isolates certain functions, including the modules (LKMs), especially well and therefore they don't have to be intricately wired into the rest of the kernel. The part of the kernel that is bound into the image that you boot (i.e., all of the kernel except the LKMs) is called the \emph{base kernel}. LKMs communicate with the base kernel. There is a tendency to think of LKMs like user space programs. Modules do share a lot of user space program properties, but LKMs are definitely not user space programs. LKMs (when loaded) are very much part of the kernel. As such, they have free run of the system and can easily crash it.
+The kernel isolates certain functions, including the modules (LKMs), especially well and therefore they don't have to be intricately wired into the rest of the kernel. The part of the kernel that is bound into the image that you boot (i.e., all of the kernel except the LKMs) is called the <i>base kernel</i>. LKMs communicate with the base kernel. There is a tendency to think of LKMs like user space programs. Modules do share a lot of user space program properties, but LKMs are definitely not user space programs. LKMs (when loaded) are very much part of the kernel. As such, they have free run of the system and can easily crash it.
 
 LKMs have several advantages:
 
 - You don't have to rebuild your kernel.
-- LKMs help you diagnose system problems. A bug in a device driver which is bound into the kernel can stop your system from booting at all.
 - They are space efficient because you can have them loaded only when you're actually using them.
 - LKMs are much faster to maintain and debug.
-
 
 In summary, LKMs are object files used to extend a running kernel's functionality. This is basically a piece of machine code that can be inserted and installed in the kernel on the fly without the need to reboot. This is very handy when you are trying to work with some new device and will be repeatedly be writing and testing your code. It is very convenient to write system code, install it, test it, and then uninstall it, without ever needing to reboot the system.
 
 ### Writing Source Code for a New Device Driver
-Recall that the kernel uses <i>jump tables</i> in order to call the correct device drivers and functions of those drivers. Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. We will create a new module `helloworld` that will log the functions being called. In Moodle you should find the `hellomodule.c` file. Create a new directory called `helloworld` in the `/home/kernel/` directory. Open the `hellomodule.c` file in your editor.
+Recall that the kernel uses <i>jump tables</i> in order to call the correct device drivers and functions of those drivers. Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. We will create a new module `helloworld` that will log the functions being called. You should find the `hellomodule.c` file in the repository. Create a new directory called `helloworld` in the `/home/kernel/` directory. Open the `hellomodule.c` file in your editor.
 
-This simple source file has all the code needed to install and uninstall an LKM in the kernel. There are two macros listed at the bottom of the source file that setup the jump table for this LKM. Whenever the module is installed, the kernel will call the routine specified in the `module_init` macro, and the routine specified in the `module_exit` will be called when the module is uninstalled.
+This simple source file has all the code needed to install and uninstall an LKM in the kernel. There are two macros listed at the bottom of the source file that setup the jump table for this LKM. Whenever the module is installed, the kernel will call the routine specified in the `module_init` macro, and the routine specified in the `module_exit` will be called when the module is uninstalled. For writing your LKM, you should use the `helloworld` module as a template.
 
 ### Compiling Source Code for a New Device Driver
 
@@ -48,7 +46,8 @@ Here, `obj-m` means that we are creating a module `hellomodule.o` from the sourc
 ```
 make
 ```
-You should now see the kernel object code `hellomodule.ko` in that directory.  In the following section, we will learn how to install our module into the kernel, then uninstall the module from the kernel.
+You should now see the kernel object code `hellomodule.ko` in that directory.  In the following section, we will learn how to install our module into the kernel, then uninstall the module from the kernel. For writing your LKM, you should consider making a new directory in `/home/kernel/` for your Makefile and source code.
+
 ### Installing/Uninstalling LKMs
 
 To insert the module, type the following command:
@@ -88,8 +87,7 @@ Using `hellomodule.c` as template, in a new C file `my_driver.c`, your task is t
 open, read, write, llseek, release
 ```
 which we will discuss in more detail momentarily.
-Immediately, we observe that a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. In your previous courses, you have more than likely encountered many sophisticated implementations of buffers.  For this assignment we will not be concerned about such implementations. The buffer should be an array of `1024` characters.  In the next section, we discuss how we <i>register</i> our device driver.
-
+You will need a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. The buffer must be an array of 1024 characters.  In the next section, we discuss how we <i>register</i> our device driver.
 
 ## Registering/Unregistering the Device Driver
 Recall that each device's virtual file is created with a major number associated with it, which allows the kernel to find the code that has been assigned to the major number when an applications tries to perform file operations upon it.
@@ -123,7 +121,7 @@ struct file_operations {
        ssize_t (*writev) (struct file* , const struct iovec* , unsigned long, loff_t* );
     };  
 ```
-Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is our responsibility to provide implementations of these operations (you can kind of think of this struct like a Java interface in that it specifies the functionality that we the programmer must implement).
+Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is our responsibility to provide implementations of these operations (you can think of this struct like a Java interface in that it specifies the functionality that we the programmer must implement).
 If we do not provide an implementation of any one of these functions, then the corresponding member is set to NULL by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.
 
 You might have also noticed the `_t` suffix naming convention.  This stands for "type" and it is our makeshift C way of announcing what kind of data we should be expecting. There are no objects in C, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of `read` should return a value of "signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
@@ -147,10 +145,32 @@ If we assign 0 to the major parameter, then the function will allocate a major d
 
 ## Implementing a Character Device Driver
 
-The close functionality is handled by `release`. Since we are developing a very simple character device driver, many of the arguments to these functions that we need to implement will not be used.  Along these lines, do not overthink the `open` and `release` functions -- their implementations should be trivial. The nontrivial programming component of this assignment is the implementation of 
+The close functionality is handled by `release`. Since we are developing a very simple character device driver, many of the arguments to these functions that we need to implement will not be used.  Along these lines, do not overthink the `open` and `release` functions -- their implementations should be trivial. The nontrivial programming component of this assignment is the implementation of the following functions.
 
-- `read` and `write`: The first parameter is a pointer to file structure. The second parameter is a pointer to a <i>data buffer</i>. Note that these buffers will be different depending on whether we are reading or writing. The third parameter is the size of data to be read or written in bytes. The fourth parameter is a pointer to 64 bit current byte offset. The return value is the number of bytes actually read/written. If the user attempts to write beyond the buffer, then you should write as many bytes to the buffer as possible, and disregard the remainder. On the other hand, you should return 0 if the user attempts to start reading beyond the buffer. Here, returning 0 indicates we have arrived at the ``end of the file".
-- 
+### `read` and `write`
+
+- The read and write methods both perform a similar task, that is, copying data from and to application code. Therefore, their prototypes are pretty similar, and it’s worth introducing them at the same time:
+```
+ssize_t read(struct file *filp, char __user *buff, size_t count, loff_t *offp);
+ssize_t write(struct file *filp, const char __user *buff, size_t count, loff_t *offp);
+```
+For both methods, `filp` is the file pointer and `count` is the size of the requested data transfer. The `buff` argument points to the user buffer holding the data to be written or the empty buffer where the newly read data should be placed. Finally, `offp` is a pointer to a "long offset type" object that indicates the file position the user is accessing. The return value is a "signed size type"; its use is discussed later. Let us repeat that the `buff` argument to the read and write methods is a <i>user space pointer</i>; therefore, it cannot be directly dereferenced by kernel code. Note that if the user attempts to write beyond the buffer, then you should write as many bytes to the buffer as possible, disregarding the remainder.
+
+The return value for `read` is interpreted by the calling application program as follows:
+- If the value equals the `count` argument passed to the read system call, the requested number of bytes has been transferred. This is the optimal case.
+- If the value is positive, but smaller than `count`, only part of the data has been transferred. This may happen for a number of reasons, depending on the device. Most often, the application program retries the read. For instance, if you read using the `fread` function, the library function reissues the system call until completion of the requested data transfer. You can also see this behavior when you do a `strace` of `cat`.
+- If the value is 0 , end-of-file was reached (and no data was read).
+- A negative value means there was an error. The value specifies what the error was, according to `<linux/errno.h>`. Typical values returned on error include `-EINTR`
+(interrupted system call) or `-EFAULT` (bad address).
+
+The return value for `write` is interpreted by the calling application program as follows:
+- If the value equals `count`, the requested number of bytes has been transferred.
+- If the value is positive, but smaller than `count`, only part of the data has been transferred. The program will most likely retry writing the rest of the data.
+- If the value is 0, nothing was written. This result is not an error, and there is no reason to return an error code. Once again, the standard library retries the call to write. 
+- A negative value means an error occurred; as for read, valid error values are those defined in `<linux/errno.h>`.
+
+### `llseek`
+
 - `llseek`: (man entry excerpt below)
 ```
 #include <sys/types.h>
@@ -183,7 +203,6 @@ my_read, my_write, my_llseek, my_open, my_release
 ![Screen Shot 2021-08-20 at 9 49 40 PM](https://user-images.githubusercontent.com/5934852/130309813-f673eebd-68ff-47fe-af13-359f1abb3900.png)
  - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for our assignment).
 
-
 ## Testing
 
 - For testing your device driver, you should modify the `seek` lab code so you can monitor the content of your device driver's buffer from user space. It is possible for read, write, and seek to appear functional in your C test code, but not interface properly with unix system utilities such as `echo`, `tail`, `head`, and so on. This means your implementation is incorrect, so be sure that your code interfaces with these utilities. Recall that `strace` allows you to see how these utilities are interfacing with your device. 
@@ -209,8 +228,7 @@ You must follow these instructions carefully; otherwise, your solution will not 
 	- `unload.sh`: An executable `bash` script that will run the `rm` and `rmmod` commands to uninstall your character device driver.
 	- `my_driver.c:` Your LKM driver code.
 
-For submitting this assignment, create a zip file (use filename `<your last name>_PA1.zip`) and zip the directory above. Submit that zip file as your submission in Moodle.
-
+For submitting this assignment, create a zip file (use filename `<your last name>_PA1.zip`) and zip the directory above. When you double-click on your zip file, the contents should be a single directory. Submit that zip file as your submission in Moodle.
 
 ## Grading
 
@@ -227,5 +245,8 @@ Implement `write`, then `read`.
 ### Checkpoint 3
 
 Implement `llseek`. You cannot earn more than 80/95 if you do not attempt `llseek`.
-	
+
+## References
+
+[1] Daniel Bovet and Marco Cesati. 2005. <i>Understanding The Linux Kernel</i>. Oreilly & Associates Inc.
 
