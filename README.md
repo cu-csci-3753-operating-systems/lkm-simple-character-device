@@ -130,7 +130,7 @@ struct file_operations {
 Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is our responsibility to provide implementations of these operations (you can kind of think of this struct like a Java \texttt{interface} in that it specifies the functionality that we the programmer must implement).
 If we do not provide an implementation of any one of these functions, then the corresponding member is set to \texttt{0} by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.
 
-You might have also noticed the `_t` suffix naming convention.  This stands for ``type" and it is our makeshift \texttt{C} way of announcing what kind of data we should be expecting. There are no objects in \texttt{C}, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of `read` should return a value of ``signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
+You might have also noticed the `_t` suffix naming convention.  This stands for ``type" and it is our makeshift C way of announcing what kind of data we should be expecting. There are no objects in C, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of `read` should return a value of "signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
 
 For the purposes of this assignment, our file operations struct, that we will pass as an argument to `register_chrdev()`, can be global and static. For example, if we were just worried about implementing `read`, then this declaration would look something like this:
 ```
@@ -151,10 +151,10 @@ If we assign 0 to the major parameter, then the function will allocate a major d
 
 ## Implementing a Character Device Driver
 
-The close functionality is handled by \texttt{release}. Since we are developing a very simple character device driver, many of the arguments to these functions that we need to implement will not be used.  Along these lines, do not overthink the \texttt{open} and \texttt{release} functions -- their implementations should be trivial. The nontrivial programming component of this assignment is the implementation of 
-\begin{enumerate}
-\item \texttt{read} and \texttt{write}: The first parameter is a pointer to file structure. The second parameter is a pointer to a \emph{data buffer}. Note that these buffers will be different depending on whether we are reading or writing. The third parameter is the size of data to be read or written in bytes. The fourth parameter is a pointer to 64 bit current byte offset. The return value is the number of bytes actually read/written. Otherwise, \texttt{-1} is returned. You should return -1 for example if the user attempts to write beyond the buffer. On the other hand, you should return 0 if the user attempts to start reading beyond the buffer. Here, returning 0 indicates we have arrived at the ``end of the file". 
-\item \texttt{llseek}: (man entry excerpt below)
+The close functionality is handled by `release`. Since we are developing a very simple character device driver, many of the arguments to these functions that we need to implement will not be used.  Along these lines, do not overthink the `open` and `release` functions -- their implementations should be trivial. The nontrivial programming component of this assignment is the implementation of 
+
+- `read` and `write`: The first parameter is a pointer to file structure. The second parameter is a pointer to a <i>data buffer</i>. Note that these buffers will be different depending on whether we are reading or writing. The third parameter is the size of data to be read or written in bytes. The fourth parameter is a pointer to 64 bit current byte offset. The return value is the number of bytes actually read/written. Otherwise, -1 is returned. You should return -1 for example if the user attempts to write beyond the buffer. On the other hand, you should return 0 if the user attempts to start reading beyond the buffer. Here, returning 0 indicates we have arrived at the ``end of the file". 
+- `llseek`: (man entry excerpt below)
 ```
 #include <sys/types.h>
 #include <unistd.h>
