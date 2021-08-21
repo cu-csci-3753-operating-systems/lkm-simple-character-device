@@ -1,6 +1,6 @@
 # A Simple Character Device LKM
 
-Your task is to implement a LKM device driver for a simple character device that supports reading, writing, and seeking. This assignment builds off the system call lab, so you are advised to complete that lab before beginning this assignment.
+Your task is to implement a LKM device driver for a simple character device that supports reading, writing, and seeking. This assignment assumes you have completed the system call lab. You are advised to complete that lab before beginning this assignment.
 
 ## Creating Your Own Device Driver
 
@@ -27,7 +27,7 @@ LKMs have several advantages:
 In summary, LKMs are object files used to extend a running kernel's functionality. This is basically a piece of machine code that can be inserted and installed in the kernel on the fly without the need to reboot. This is very handy when you are trying to work with some new device and will be repeatedly be writing and testing your code. It is very convenient to write system code, install it, test it, and then uninstall it, without ever needing to reboot the system.
 
 ### Writing Source Code for a New Device Driver
-Recall that the kernel uses \emph{jump tables} in order to call the correct device drivers and functions of those drivers. Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. We will create a new module `helloworld` that will log the functions being called. In Moodle you should find the `hellomodule.c` file. Create a new directory called `helloworld` in the `/home/kernel/` directory. Open the `hellomodule.c` file in your editor.
+Recall that the kernel uses <i>jump tables</i> in order to call the correct device drivers and functions of those drivers. Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. We will create a new module `helloworld` that will log the functions being called. In Moodle you should find the `hellomodule.c` file. Create a new directory called `helloworld` in the `/home/kernel/` directory. Open the `hellomodule.c` file in your editor.
 
 This simple source file has all the code needed to install and uninstall an LKM in the kernel. There are two macros listed at the bottom of the source file that setup the jump table for this LKM. Whenever the module is installed, the kernel will call the routine specified in the `module_init` macro, and the routine specified in the `module_exit` will be called when the module is uninstalled.
 
@@ -44,7 +44,7 @@ clean:
 	make -C /lib/modules/$(shell uname -r)/build M=/home/kernel/helloworld modules
 ```
 
-Here, `obj-m` means that we are creating a module \texttt{hellomodule.o} from the source code file `hellomodule.c`, thus `hellomodule.c` should be in the same directory as your `Makefile`. In the `/home/kernel/helloworld` directory, run the following command:
+Here, `obj-m` means that we are creating a module `hellomodule.o` from the source code file `hellomodule.c`, thus `hellomodule.c` should be in the same directory as your `Makefile`. In the `/home/kernel/helloworld` directory, run the following command:
 ```
 make
 ```
@@ -63,15 +63,11 @@ sudo rmmod hellomodule
 ```
 To verify that the module was uninstalled, check the system log and you should see our module exit message. You can also use the `lsmod` command to verify the module is no longer in the system.
 
-
-
-
 ## Creating a Virtual File for the Device
-
 
 We know that device drivers can be dynamically installed into the kernel, but how does the kernel know which device driver to use with which device? 
 
-Each device will have a corresponding device file that is located in the `/dev` directory. If you list the files in that directory you will see all the devices currently known by the kernel. These are not regular files, they are \emph{virtual files} that only supply data from or give data to the device. There is not any physical storage on the disk for these devices like the files that we are used to. The device driver code is responsible for creating a mechanism to store all the information.
+Each device will have a corresponding device file that is located in the `/dev` directory. If you list the files in that directory you will see all the devices currently known by the kernel. These are not regular files, they are <i>virtual files</i> that only supply data from or give data to the device. There is not any physical storage on the disk for these devices like the files that we are used to. The device driver code is responsible for creating a mechanism to store all the information.
 
 To add a new device you need to create a new entry in the `/dev` directory. Each virtual file has information associated with it to tell the kernel which device driver to use when accessing the device. Recall that in Linux, each device driver is given a device \emph{major number} to uniquely identify it.
 
@@ -79,20 +75,20 @@ You can create a new virtual device file to be associated with your device drive
 ```
 sudo mknod  <location> <type of driver> <major number> <minor number>
 ```
-The major number should be unique and you can look at current devices already installed, but usually user modules start at 240.  The \emph{minor number} can be 0. The type of our driver should be `c` for character. Note that more sophisticated drivers must deal with blocks of arbitrary data, in which case the type is `b` (see `man mknod` for more details).  Putting it all together, run the following command:
+The major number should be unique and you can look at current devices already installed, but usually user modules start at 240.  The <i>minor number</i> can be 0. The type of our driver should be `c` for character. Note that more sophisticated drivers must deal with blocks of arbitrary data, in which case the type is `b` (see `man mknod` for more details).  Putting it all together, run the following command:
 ```
 sudo mknod /dev/simple_character_device c 240 0
 ```
-Note that \texttt{simple\_character\_device} is a file, so we can change its permissions using \texttt{chmod}.  To be sure that we can read, write, and execute this file, run the following command:
+Note that `simple_character_device` is a file, so we can change its permissions using `chmod`.  To be sure that we can read, write, and execute this file, run the following command:
 ```
 sudo chmod 777 /dev/simple_character_device
 ```
-Using \texttt{hellomodule.c} as template, in a new \texttt{C} file \texttt{my\_driver.c}, your task is to create a new character device driver that suports the following file operations: 
+Using `hellomodule.c` as template, in a new C file `my_driver.c`, your task is to create a new character device driver that suports the following file operations: 
 ```
 open, read, write, llseek, release
 ```
 which we will discuss in more detail momentarily.
-Immediately, we observe that a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. In your previous courses, you have more than likely encountered many sophisticated implementations of buffers.  For this assignment we will not be concerned about such implementations. The buffer should be an array of `1024` characters.  In the next section, we discuss how we \emph{register} our device driver.
+Immediately, we observe that a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. In your previous courses, you have more than likely encountered many sophisticated implementations of buffers.  For this assignment we will not be concerned about such implementations. The buffer should be an array of `1024` characters.  In the next section, we discuss how we <i>register</i> our device driver.
 
 
 ## Registering/Unregistering the Device Driver
@@ -127,8 +123,8 @@ struct file_operations {
        ssize_t (*writev) (struct file* , const struct iovec* , unsigned long, loff_t* );
     };  
 ```
-Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is our responsibility to provide implementations of these operations (you can kind of think of this struct like a Java \texttt{interface} in that it specifies the functionality that we the programmer must implement).
-If we do not provide an implementation of any one of these functions, then the corresponding member is set to \texttt{0} by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.
+Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is our responsibility to provide implementations of these operations (you can kind of think of this struct like a Java interface in that it specifies the functionality that we the programmer must implement).
+If we do not provide an implementation of any one of these functions, then the corresponding member is set to NULL by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.
 
 You might have also noticed the `_t` suffix naming convention.  This stands for ``type" and it is our makeshift C way of announcing what kind of data we should be expecting. There are no objects in C, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of `read` should return a value of "signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
 
@@ -167,7 +163,7 @@ The ``llseek`` function sets the 64-bit extended file pointer associated with th
 - If whence is `SEEK_CUR`, the pointer is set to its current location plus offset.
 - If whence is `SEEK_END`, the pointer is set to the size of the file plus offset.
 
-You must use these macros in your implementation. Upon successful completion, llseek returns the resulting pointer location \emph{as measured in bytes from the beginning of the file}. Otherwise, -1 is returned, the file pointer remains unchanged. Here, ``pointer" is used generically, i.e., it is not a C pointer per se.
+You must use these macros in your implementation. Upon successful completion, `llseek` returns the resulting pointer location \emph{as measured in bytes from the beginning of the file}. Otherwise, -1 is returned, the file pointer remains unchanged (here, `"pointer" is used generically, i.e., it is not a C pointer per se).
 
 - In addition to implementing these functions, your device driver must also print the number of times that the device has been opened to the kernel log.
 
@@ -178,7 +174,7 @@ my_read, my_write, my_llseek, my_open, my_release
 
 ### Hints
 
-- If you are having trouble getting started, use \texttt{helloworld.c} as a starting point. 
+- If you are having trouble getting started, use `helloworld.c` as a starting point. 
 - You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages). They will all be of the form `#include <linux/*.h>`.
 - Remember that your module lives in <i>kernel space</i> but some arguments of our functions point to buffers in <i>user space</i>.
 - Since we are implementing `llseek`, you will also need to keep track of the <i>present position</i> in the buffer. The `loff_t f_pos` field of the `file* filp` struct is essential for keeping track of this information. It represents the current reading or writing position. `loff_t` is a 64-bit value on all platforms
@@ -189,14 +185,14 @@ my_read, my_write, my_llseek, my_open, my_release
 
 ## Testing
 
-- For testing your device driver, you should modify the `seek` lab code so you can monitor the content of your device driver's buffer from user space. It is possible for read, write, and seek to appear functional in your `C` test code, but not interface properly with unix system utilities such as `echo`, `tail`, `head`, and so on. This means your implementation is incorrect, so be sure that your code interfaces with these utilities. Recall that `strace` allows you to see how these utilities are interfacing with your device. 
+- For testing your device driver, you should modify the `seek` lab code so you can monitor the content of your device driver's buffer from user space. It is possible for read, write, and seek to appear functional in your C test code, but not interface properly with unix system utilities such as `echo`, `tail`, `head`, and so on. This means your implementation is incorrect, so be sure that your code interfaces with these utilities. Recall that `strace` allows you to see how these utilities are interfacing with your device. 
 
 - An easy way to test the write functionality of your device driver is to perform I/O redirection in the terminal as follows:
 ```
 echo 'hello world' > /dev/simple_character_device
 ```
-which will write ``hello world" to our character device driver. 
-- To test the reading of characters from our device, try using the \texttt{cat} command, which will open, read repeatedly until EOF is reached, and then close the file.
+which will write "hello world" to our character device driver. 
+- To test the reading of characters from our device, try using the `cat` command, which will open, read repeatedly until EOF is reached, and then close the file.
 ```
 cat /dev/simple_character_device
 ```
