@@ -4,8 +4,8 @@
 </figure>
 <hr>
     
-Adding functionality to the kernel can be accomplished using differenct methods.
- To create a new system call, you must write the code, find a new slot in the system call junp table, add the new function to the system call jump table, add new files to the build,  and then recompiler the operating system.   There are thousands of files in the kernel that need to be build.  Luckily it is all done using makefiles so only the changed files need to be recompiled after fixing bugs or developing new functionality.   
+Adding functionality to the kernel can be accomplished using different  methods.
+ To create a new system call, you must write the code, find a new slot in the system call jump table, add the new function to the system call jump table, add new files to the build,  and then recompile the operating system.   There are thousands of files in the kernel that need to be build.  Luckily it is all done using makefiles so only the changed files need to be recompiled after fixing bugs or developing new functionality.   
  
 The more difficult part is getting that new kernel to be run.  You must place the kernel into the boot loader and reboot your system.  If the kernel fails to load because of the new code changes, you must reboot and select a previous kernel.  If you code does not work as required, you will need to fix the bug and go through all those steps again to boot the new kernel.
 
@@ -56,7 +56,7 @@ Device drivers are used to enable communication between the operating system and
 * RAID Controllers: RAID controllers, used for managing redundant array of independent disks (RAID) configurations, require device drivers to manage data storage and fault tolerance.
 * Audio Devices: You can connect speakers or headphones to the audio output to enable audio playback.
 * Sensors: A wide range of sensors such as temperature sensors, humidity sensors, motion sensors, light sensors, and more produce a stream of characters that can be interpreted to get the sensor readings. These sensors can enable environmental monitoring, home automation, and various IoT (Internet of Things) applications.
-* Motor Controllers: The hardware port allows acccess to the physical devices such as motor controllers that would control motors for robotics projects, motorized vehicles, and other physical computing applications.    
+* Motor Controllers: The hardware port allows access to the physical devices such as motor controllers that would control motors for robotics projects, motorized vehicles, and other physical computing applications.    
 
 These are just a few examples of the many hardware devices that rely on device drivers to interact with the operating system. Device drivers provide the necessary software abstraction to ensure seamless communication and integration between hardware and software components.
 
@@ -70,7 +70,7 @@ This assignment assumes you have completed the first two labs that explore the F
 Based on your exploration of the File IO system calls, you will now create a kernel module that can support the basic management of a device and transferring data to and from the device.   
  This buffer will be a virtual file that can be read and written.
  The device will allocate a kernel buffer when the module is loaded.
- The device will maintain the kernel data structures and validate the transfer of data to garuantee that memory is handled securely (no overwrites).
+ The device will maintain the kernel data structures and validate the transfer of data to guarantee  that memory is handled securely (no overwrites).
  The LKM interface for devices is similar to the interface to a file.  
  In fact, the disk is just a device (block device) and uses a similar interface to support file IO.
   
@@ -241,7 +241,7 @@ For both methods, `filp` is the file pointer and `count` is the size of the requ
 
 The return value for `read` is interpreted by the calling application program as follows:
 - If the value equals the `count` argument passed to the read system call, the requested number of bytes has been transferred. This is the optimal case.
-- If the value is positive, but smaller than `count`, only part of the data has been transferred. This may happen for a number of reasons, depending on the device. Most often, the application program retries the read. For instance, if you read using the `fread` function, the library function reissues the system call until completion of the requested data transfer. You can also see this behavior when you do a `strace` of `cat`.
+- If the value is positive, but smaller than `count`, only part of the data has been transferred. This may happen for a number of reasons, depending on the device. Most often, the application program retries the read. For instance, if you read using the `fread` function, the library function reissues the system call until completion of the requested data transfer. You can also see this behavior when you do a `trace` of `cat`.
 - If the value is 0 , end-of-file was reached (and no data was read).
 - A negative value means there was an error. The value specifies what the error was, according to `<linux/errno.h>`. Typical values returned on error include `-EINTR` (interrupted system call) or `-EFAULT` (bad address). For your LKM, the latter should be returned if any of the system calls invoked in `read` or `write` throws an error.
 
