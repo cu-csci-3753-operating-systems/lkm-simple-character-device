@@ -1,6 +1,6 @@
-# CSPB-3753  Programming Assignment 1 :  Loadable Kernel Module
+# CSPB-3753  Programming Assignment 1: Loadable Kernel Module
 <figure width=100%>
-  <IMG SRC="https://www.colorado.edu/cs/profiles/express/themes/cuspirit/logo.png" WIDTH=100 ALIGN="right">
+  <IMG SRC="https://www.colorado.edu/cs/profiles/express/themes/cuspirit/logo.png" WIDTH=100 ALIGN="right" style="margin:20px">
 </figure>
 <hr>
     
@@ -9,20 +9,20 @@ Adding functionality to the kernel can be accomplished using different  methods.
  
 The more difficult part is getting that new kernel to be run.  You must place the kernel into the boot loader and reboot your system.  If the kernel fails to load because of the new code changes, you must reboot and select a previous kernel.  If you code does not work as required, you will need to fix the bug and go through all those steps again to boot the new kernel.
 
-### Installing a custom kernel on a Linux system typically involves several steps
-Here's a general outline of the process:
-* Obtain the kernel source code: Download the source code of the custom kernel you wish to install. You can usually find it on the kernel developer's website or through a version control system like Git.
+### Here's a general outline of the process to install a custom kernel on a Linux system:
+ 
+* Obtain the kernel source code: Download the source code of the custom kernel you wish to install. You can usually find it on the kernel developer's website.
 * Prepare the system: Ensure that your system meets the necessary requirements for building and installing a custom kernel. This may involve installing development tools, headers, and other dependencies.
 * Configure the kernel: Customize the kernel configuration to suit your specific needs. This can be done through the kernel's configuration menu (e.g., make menuconfig, make xconfig) or by modifying a configuration file directly.
-* Build the kernel: Use the appropriate commands (e.g., make) to compile the kernel source code into a usable binary. This process may take some time depending on your system's specifications.
-* Install the kernel modules: If your custom kernel includes any loadable kernel modules, you'll need to install them as well. This typically involves running commands like make modules_install or manually copying the module files to the appropriate locations.
+* Build the kernel: Use the appropriate commands (e.g., make) to compile the kernel source code into a usable binary. This process may take some time depending on your system's resources.
 * Install the kernel image: Copy the compiled kernel image (usually named vmlinuz) to the appropriate location on your system, typically in the /boot directory.
-* Update the bootloader configuration: Modify the bootloader configuration file (e.g., GRUB or LILO) to include an entry for the new custom kernel. This step ensures that the system can boot into the custom kernel.
-* Update the bootloader: If necessary, update the bootloader to reflect the changes made in the configuration file. This step varies depending on the bootloader in use and may involve running a command like update-grub or grub2-mkconfig.
 * Reboot the system: After completing the previous steps, reboot your system to load the newly installed custom kernel. Ensure that you select the correct kernel entry during the boot process.
 
 It's important to note that installing a custom kernel carries some risks, and it's recommended to have a backup or recovery plan in case any issues arise. Additionally, the exact commands and steps may vary depending on your specific Linux distribution and the version of the custom kernel you're installing.  You must rebuild the kernel and walk through the steps to get it to boot, every time you make a change.
- 
+
+We do have a lab writeup if you would like to try this on your own.
+
+### Adding functionality to the kernel dynamically
 <figure width=100%>
   <IMG SRC="images/Interaction-of-Linux-kernel-modules-with-their-environment.png" ALIGN="left" width="30%">
 </figure>
@@ -31,12 +31,15 @@ Loadable Kernel Modules (LKMs) are dynamically loadable and unloadable software 
 
 LKMs can provide additional device drivers, filesystems, networking protocols, and other kernel-level functionality. They can be loaded and unloaded at runtime, providing flexibility and modularity to the Linux kernel. LKMs are widely used to extend and customize the functionality of the Linux operating system.
 
- 
-The LKM interface is a set of functions and mechanisms provided by the Linux kernel to allow the loading, unloading, and management of kernel modules. This interface provides a standardized way for LKMs to interact with the kernel and utilize its services.  
-The LKM interface typically includes functions for module initialization, cleanup, and handling of module parameters. It also provides functions to register and unregister module-specific functionalities such as device drivers, filesystems, and network protocols. 
-By conforming to the LKM interface, developers can ensure compatibility and portability of their modules across different kernel versions and distributions. The LKM interface abstracts the complexities of interacting with the kernel, making it easier to develop and maintain loadable kernel modules for the Linux operating system.
- 
- 
+The LKM interface is a set of functions and mechanisms provided by the Linux kernel to allow the loading, unloading, and management of kernel modules. This interface provides a standardized way for LKMs to interact with the kernel and utilize its services.
+
+The LKM interface typically includes functions for module initialization, cleanup, and handling of module parameters. 
+ It also provides functions to register and unregister module-specific functionalities such as device drivers, filesystems, and network protocols.
+By conforming to the LKM interface, developers can ensure compatibility and
+ portability of their modules across different kernel versions and distributions.
+ The LKM interface abstracts the complexities of interacting with the kernel, making it easier to develop and
+ maintain loadable kernel modules for the Linux operating system.
+
 <hr> 
  
 ## Device Drivers
@@ -47,38 +50,47 @@ By conforming to the LKM interface, developers can ensure compatibility and port
 Device drivers are used to enable communication between the operating system and various hardware devices. Almost all hardware devices in a computer system require a device driver for proper functioning. Some common types of devices that use device drivers include:
 
 * Printers and Scanners: Printers and scanners require device drivers to communicate with the operating system and enable printing, scanning, and other related functions.
+
 * Graphics and Display Devices: Graphics cards, video adapters, and display monitors utilize device drivers to provide the necessary interface for the operating system to control and display graphics on the screen.
-*Network Interface Cards (NICs): Network interface cards, including Ethernet adapters and Wi-Fi cards, require device drivers to enable network connectivity and facilitate data transmission between the computer and the network.
-*Sound Cards: Sound cards utilize device drivers to enable audio playback, recording, and control audio settings and features.
-*Storage Devices: Hard drives, solid-state drives (SSDs), optical drives (CD/DVD), and other storage devices require device drivers to facilitate data storage and retrieval operations.
+
+* Network Interface Cards (NICs): Network interface cards, including Ethernet adapters and Wi-Fi cards, require device drivers to enable network connectivity and facilitate data transmission between the computer and the network.
+
+* Sound Cards: Sound cards utilize device drivers to enable audio playback, recording, and control audio settings and features.
+
+* Storage Devices: Hard drives, solid-state drives (SSDs), optical drives (CD/DVD), and other storage devices require device drivers to facilitate data storage and retrieval operations.
+
 * USB Devices: USB devices such as keyboards, mice, game controllers, external hard drives, and other peripherals require device drivers to establish communication and enable their specific functionalities.
+
 * Input/Output Devices: Various input/output devices such as keyboards, mice, touchpads, touchscreens, and other input devices use device drivers to transmit input signals to the operating system and receive output instructions.
-* RAID Controllers: RAID controllers, used for managing redundant array of independent disks (RAID) configurations, require device drivers to manage data storage and fault tolerance.
-* Audio Devices: You can connect speakers or headphones to the audio output to enable audio playback.
+
+* RAID Controllers: RAID controllers, used for managing redundant array of independent disks (RAID) configurations, require device drivers to manage data storage and fault tolerance. (We will visit this topic later in the semester)
+
 * Sensors: A wide range of sensors such as temperature sensors, humidity sensors, motion sensors, light sensors, and more produce a stream of characters that can be interpreted to get the sensor readings. These sensors can enable environmental monitoring, home automation, and various IoT (Internet of Things) applications.
+
 * Motor Controllers: The hardware port allows access to the physical devices such as motor controllers that would control motors for robotics projects, motorized vehicles, and other physical computing applications.    
 
 These are just a few examples of the many hardware devices that rely on device drivers to interact with the operating system. Device drivers provide the necessary software abstraction to ensure seamless communication and integration between hardware and software components.
 
 <hr>
 
-## Creating Your Own Simple Character Device Driver
+## Creating Your Device Driver
 Your task for the programming assignment is to implement a LKM device driver for a simple character device that supports reading, writing, and seeking. 
 This assignment assumes you have completed the first two labs that explore the File IO system calls. 
-**You are advised to complete those labs before beginning this assignment.**
+**You are advised to complete those labs before beginning this assignment.** 
+Based on your exploration of the File IO system calls, you will now create a kernel module that can support the basic management of a device and transferring data to and from a character device.
  
-Based on your exploration of the File IO system calls, you will now create a kernel module that can support the basic management of a device and transferring data to and from the device.   
- This buffer will be a virtual file that can be read and written.
- The device will allocate a kernel buffer when the module is loaded.
- The device will maintain the kernel data structures and validate the transfer of data to guarantee  that memory is handled securely (no overwrites).
- The LKM interface for devices is similar to the interface to a file.  
+Your device driver will allocate a kernel buffer when the module is loaded to store information that is written to the device.
+ This device driver will be a virtual file that can be read and written.
+ The device will also maintain the kernel data structures and validate the transfer of data to guarantee  that memory is handled securely (no buffer overwrites).
+ The LKM interface for devices is similar to the interface to a file.
  In fact, the disk is just a device (block device) and uses a similar interface to support file IO.
   
-A simple device driver is a software component that allows communication between an operating system and a specific hardware device. It provides an interface for the operating system to interact with the device, enabling it to send commands, receive data, and manage device operations.
+A simple device driver allows communication between an operating system and a specific hardware device. It provides an interface for the operating system to interact with the device, enabling it to send commands, receive data, and manage device operations.
 
 A simple device driver typically consists of two main components:
 * Initialization and setup: The driver initializes the device, performs any necessary configurations, and establishes communication with the operating system. This may involve tasks such as allocating resources, setting up interrupts, and registering the device with the kernel.
-* Device operations: The driver implements functions or methods that handle various device operations, such as reading from and writing to the device, handling interrupts, managing power states, and performing other device-specific tasks.
+* Device operations: The driver implements functions or methods that handle various device operations, such as reading from and writing to the device, handling interrupts, and performing other device-specific tasks.
+
 Simple device drivers are often written for specific hardware devices with well-defined interfaces and straightforward functionality. They serve as examples or starting points for more complex device drivers and provide a basic understanding of how device drivers work.
 
 It's worth noting that the complexity of device drivers can vary significantly depending on the hardware and the desired level of functionality. Simple device drivers may only provide basic functionality, while more advanced drivers may support advanced features, error handling, and additional device-specific operations.
@@ -87,7 +99,41 @@ It's worth noting that the complexity of device drivers can vary significantly d
 
 ### Building Loadable Kernel Modules (LKMs)
 
-Recall that the kernel uses <i>jump tables</i> in order to call the correct device drivers and functions of those drivers. Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. 
+Recall that the kernel uses <i>jump tables</i> in order to call the correct system call. Device drivers use a similar jump table to map generic functions to specific code within the device driver. 
+ Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. 
+
+We have provided you an example character device driver in the assignment repository. This section will walk you through the code as well as how to build and load a device driver. 
+``` 
+#include<linux/init.h>
+#include<linux/module.h>
+
+int sample_init(void)
+{
+	printk(KERN_ALERT "inside %s function\n",__FUNCTION__);
+	return 0;
+}
+
+void hello_exit(void)
+{
+	printk(KERN_ALERT "inside %s function\n",__FUNCTION__);
+}
+
+module_init(hello_init);
+module_exit(hello_exit);
+```
+In this code there are two functions defined,
+ one that will be called when the LKM is loaded into the kernel,
+ and the other to be called when the LKM is unloaded (removed) from the kernel.
+ Notice that there is no `main` function because you will only write functions to be called by the kernel as needed.
+ All the code is doing in this example is printing a message that the function was called.
+ You cannot use the C library `printf(...)` function when inside the kernel because it is a user space function.
+ Instead you must use the kernel safe version called `printk` that takes one extra parameter 
+ at the beginning of the parameter list for the level of the message.  Here we are using a message level of `KERN_ALERT`.
+ You should also note that we are using a predefined variable that is substituted by the compiler.  The `__FUNCTION__` specifies to place the string with the name of the function into the print statement.  
+ 
+At the bottom of the code are two macros that have been defined to help write device drivers.
+The first is `module_init` that specifies the name of the function that should be called when the LKM is loaded.  
+ The other macro is used to specify the function to call when the LKM is unloaded.
  
 We will create a new module `helloworld` that will log the functions being called. 
  You should find the `hellomodule.c` file in the repository. 
@@ -100,58 +146,91 @@ This simple source file has all the code needed to install and uninstall an LKM 
  and the routine specified in the `module_exit` will be called when the module is uninstalled. 
  For writing your LKM, you should use the `helloworld` module as a template.
 
+ 
+The steps shown for creating and testing an LKM are:
+ 1. Build the Loadable Kernel Module from the C code.
+ 2. Install the LKM using the `insmod` command.
+ 3. See the message(s) written to the system log using the `dmesg` command.
+ 4. Uninstall the LKM using `rmmod` command.
+ 5. Create a device on your system to associate to your LKM
+ 6. Change the code to tell the kernel that your LKM will handle that device.
+ 7. Write the code to handle the other operations for your device.
 <hr>
 
-### Compiling Source Code for a New Device Driver
+#### 1. Build the Loadable Kernel Module from the C code
 
 Let's now compile the module. There are a couple of ways to add your module to the list of modules to be built for a kernel. One is to modify the makefile used by the kernel build. The other is to write your own local makefile and attach it to the build when we want to make the modules. The latter is a bit safer, so what we'll do is create a new file called `Makefile` in the `/home/kernel/helloworld` directory, then type the following lines in the file:
 
 ```
-obj-m:= hellomodule.o
+obj-m:= sample_module.o
 all:
-	make -C /lib/modules/$(shell uname -r)/build M=/home/kernel/helloworld modules
+	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd)/sample_module modules
 
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=/home/kernel/helloworld modules
+	make -C /lib/modules/$(shell uname -r)/build M=$(shell pwd)/sample_module modules
 ```
 
-Here, `obj-m` means that we are creating a module `hellomodule.o` from the source code file `hellomodule.c`, thus `hellomodule.c` should be in the same directory as your `Makefile`. In the `/home/kernel/helloworld` directory, run the following command:
+Here, we have defined a variable `obj-m` that specifies we are creating a module `sample_module.o` from the source code file `sample_module.c`, thus `sample_module.c` should be in the same directory as your `Makefile`. In that same directory, run the following command:
 ```
 make
 ```
-You should now see the kernel object code `hellomodule.ko` in that directory.  In the following section, we will learn how to install your module into the kernel, then uninstall the module from the kernel. For writing your LKM, you should consider making a new directory in `/home/kernel/` for your Makefile and source code.
+You should now see the kernel object code `sample_module.ko` in that directory.  In the following section, we will learn how to install your module into the kernel, then uninstall the module from the kernel. For writing your LKM, you should consider making a new directory in `/home/kernel/` for your Makefile and source code.
 
 <hr>
 
-### Installing/Uninstalling LKMs
+####  2. Install the LKM using the `insmod` command
 
-To insert the module, type the following command:
+To insert the module into the kernel, type the following command:
 ```
-sudo insmod hellomodule.ko
+sudo insmod sample_module.ko
 ```
-The kernel has tried to insert your module. If it is successful, the `module_init()` function will be called and you will see the log message that has been inserted into `/var/logs/system.log`. If you type `lsmod` you will see your module is now inserted in the kernel.
+If you type `lsmod` you will see your module is now inserted in the kernel.
 
-Let's now uninstall the module from the kernel by using the following command:
+<hr>
+
+####  3. See the message(s) written to the system log 
+
+The kernel has tried to insert your module. If it is successful, the `module_init()` function will be called and you will see the log message that was produced from the `printk` function.  There are many different loags used by the system.  These messages will be located in the `/var/logs/system.log` file.  You can list out the contents (can be very long file) or you can see the last messages placed into the log file using `tail` command.  
+ 
+Another way to see the log messages is using `dmesg` command that can filter the messages.  Try the command `dmesg --level=err,warn` to see all the errors and warning level messages.
+ 
+<hr>
+
+####  4. Uninstall the LKM using `rmmod` command 
+
+ Once the LKM is installed, the `sample_module.ko` file is locked and cannot be overwritten.  You must release the file by unloading the LKM from the kernel.  If you want to make changes to the code and build a new version of the LKM, you will need to unload the LKM.
 ```
-sudo rmmod hellomodule
+sudo rmmod sample_module
 ```
 To verify that the module was uninstalled, check the system log and you should see your module exit message. You can also use the `lsmod` command to verify the module is no longer in the system.
-
+```
+Module                  Size  Used by
+tls                   118784  0
+isofs                  53248  1
+bnep                   28672  2
+vsock_loopback         16384  0
+vsock                  49152  7 vmw_vsock_virtio_transport_common,vsock_loopback,vmw_vsock_vmci_transport
+binfmt_misc            24576  1
+sample_module          12345  1
+ . 
+ . 
+ .
+```
 <hr>
 
-## Creating a Virtual File for the Device
+####  5. Create a device on your system to associate to your LKM
 
-We know that device drivers can be dynamically installed into the kernel, but how does the kernel know which device driver to use with which device? 
+We know that device drivers can be dynamically installed into the kernel, but *how does the kernel know which device driver to use with which device?*
 
-Each device will have a corresponding device file that is located in the `/dev` directory. If you list the files in that directory you will see all the devices currently known by the kernel. These are not regular files, they are <i>virtual files</i> that only supply data from or give data to the device. There is not any physical storage on the disk for these devices like the files that we are used to. The device driver code is responsible for creating a mechanism to store all the information.
-
-To add a new device you need to create a new entry in the `/dev` directory. Each virtual file has information associated with it to tell the kernel which device driver to use when accessing the device. Recall that in Linux, each device driver is given a device \emph{major number} to uniquely identify it.
+Each device will have a corresponding device file that is located in the `/dev` directory. If you list the files in that directory you will see all the devices currently known by the kernel. These are not regular files, they are <i>virtual files</i> that only supply data from or give data to the device. There is not any physical storage on the disk for these devices like the files that we used in our system call labs. The device driver code is responsible for creating a mechanism to store all the information.
+ 
+To add a new device you need to create a new entry in the `/dev` directory. Each virtual file has information associated with it to tell the kernel which device driver to use when accessing the device. Recall that in Linux, each device driver is given a device **major number** to uniquely identify it.
 
 You can create a new virtual device file to be associated with your device driver. First, we'll find an unused major number for your kernel, then we'll use the `mknod` command to create a new device entry and associate the new major number for your device driver. 
 ```
 sudo mknod  <location> <type of driver> <major number> <minor number>
 ```
-The major number should be unique and you can look at current devices already installed, but usually user modules start at 240.  The <i>minor number</i> can be 0. The type of your driver should be `c` for character. Note that more sophisticated drivers must deal with blocks of arbitrary data, in which case the type is `b` (see `man mknod` for more details).  Putting it all together, run the following command:
+The major number should be unique and you can look at current devices already installed, but usually user modules start at 240.  The *minor number* can be 0. The type of your driver should be `c` for character. Note that more sophisticated drivers must deal with blocks of arbitrary data, in which case the type is `b` (see `man mknod` for more details).  Putting it all together, run the following command:
 ```
 sudo mknod /dev/simple_character_device c 240 0
 ```
@@ -159,14 +238,8 @@ Note that `simple_character_device` is a file, so we can change its permissions 
 ```
 sudo chmod 777 /dev/simple_character_device
 ```
-Using `hellomodule.c` as template, in a new C file `my_driver.c`, your task is to create a new character device driver that suports the following file operations: 
-```
-open, read, write, llseek, release
-```
-which we will discuss in more detail momentarily.
-You will need a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. The buffer must be an array of 1024 characters.  In the next section, we discuss how we <i>register</i> your device driver.
+####  6. Change the code to tell the kernel that your LKM will handle that device
 
-## Registering/Unregistering the Device Driver
 Recall that each device's virtual file is created with a major number associated with it, which allows the kernel to find the code that has been assigned to the major number when an applications tries to perform file operations upon it.
 This means that when a module is loaded, it needs to tell the kernel which device it will be supporting by associating a major number with the module. Since your device is a character device, this can be accomplished using the `register_chrdev()` function, whose prototype is stated below:
 ```
@@ -176,7 +249,18 @@ int register_chrdev (unsigned int  major,
 ```
 Its first argument is self-explanatory, as is the second (recall that we called your virtual file `simple_character_device`, so we could pass that as your string).  The third parameter deserves a proper discussion which we will get to momentarily. We also need to unregister your device driver if we decide to unload the kernel module.  This is accomplished with the `unregister_chrdev(unsigned int major, const char* name)` function.
 
+<hr>
 
+####  7. Write the code to handle the other operations for your device
+
+Using `sample_module.c` as template, in a new C file `my_driver.c`, your task is to create a new character device driver that suports the following file operations: 
+```
+open, read, write, llseek, release
+```
+You will need a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. The buffer must be an array of 1024 characters. Although you can statically allocate the space, see  `kmalloc` and `kfree` for the allocation and freeing of kernel memory. The kmalloc allocation engine is a powerful tool and easily learned because of its similarity to malloc. The function is fast (unless it blocks) and doesn’t clear the memory it obtains; the allocated region still holds its previous content.[1] The allocated region is also contiguous in physical memory.
+ 
+Remember that we mentioned that you will need to create a jump table to associate the functions that you write in your device driver and the operations that the kernel will access.  This is accompished with a kernel structure `file_operations`.
+ 
 Below is the definition of the somewhat involved `file_operations` struct:
 ```
 struct file_operations {
@@ -198,12 +282,15 @@ struct file_operations {
        ssize_t (*writev) (struct file* , const struct iovec* , unsigned long, loff_t* );
     };  
 ```
-Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is your responsibility to provide implementations of these operations (you can think of this struct like a Java interface in that it specifies the functionality that we the programmer must implement).
-If we do not provide an implementation of any one of these functions, then the corresponding member is set to NULL by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.
+Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is your responsibility to provide implementations of these operations. You can think of this struct like a Java interface in that it specifies the functionality that we the programmer must implement or using virtual functions in a C++ class.
+If you do not provide an implementation of any one of these functions, then the corresponding member is set to NULL by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.  Your implmentation will require ```open, read, write, llseek, release``` members to be defined.
 
-You might have also noticed the `_t` suffix naming convention.  This stands for "type" and it is your makeshift C way of announcing what kind of data we should be expecting. There are no objects in C, so these are primitive data types, but it tells the programmer how to interpret the data.  For example, an implementation of `read` should return a value of "signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
+Notice the variable types used in the definitionns.  
+ Notice the `_t` suffix naming convention, which stands for "type" and it is a way to abstract the actual data type used.  
+ This is important as different systems have different sizes for values.
+ For example, an implementation of `read` should return a value of "signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
 
-For the purposes of this assignment, your file operations struct, that we will pass as an argument to `register_chrdev()`, can be global and static. For example, if we were just concerned about implementing `read`, then this declaration would look something like this:
+For the purposes of this assignment, your file operations struct, that is passed as an argument to `register_chrdev()`, can be global and static. For example, if we were just concerned about implementing `read`, then this declaration would look something like this:
 ```
 // recall that . is the member access operator in C
 static struct file_operations simple_driver_fops =
@@ -212,17 +299,18 @@ static struct file_operations simple_driver_fops =
     .read    = my_read,
 };
 ```
-where `my_read` is a function that implements `read`.  The prototype of your read function should of course be:
+where `my_read` is a function that implements the `read` operation on the given file structure.  The prototype of your read function should of course be:
 ```
 ssize_t my_read (struct file* , char* , size_t, loff_t* );
 ```
-The declaration of the `THIS_MODULE` macro is contained in the `linux/module.h` header file. 
+The declaration of the `THIS_MODULE` macro is contained in the `linux/module.h` header file.
+ It will label the handler with the name of the module.
 
 If we assign 0 to the major parameter, then the function will allocate a major device number (i.e. the value it returns) on its own, which allows us to not know in advance which major device numbers are taken.
 
 <hr>
 
-## Implementing a Character Device Driver
+### Implementing a Character Device Driver
 
 Your main task is to give an implementation of five functions: `read`, `write`, `llseek`, `open`, `release`. You must name your functions:
 ```
@@ -230,7 +318,7 @@ my_read, my_write, my_llseek, my_open, my_release
 ```
 The close functionality is handled by `release`. Since we are developing a very simple character device driver, many of the arguments to these functions that we need to implement will not be used.  Along these lines, do not overthink the `open` and `release` functions -- their implementations should be trivial. The nontrivial programming component of this assignment is the implementation of the following functions.
 
-### `read` and `write`
+#### `read` and `write`
 
 - The read and write methods both perform a similar task, that is, copying data from and to application code. Therefore, their prototypes are pretty similar, and it’s worth introducing them at the same time:
 ```
@@ -252,7 +340,7 @@ The return value for `write` is interpreted by the calling application program a
 - A negative value means an error occurred; as for `read`, valid error values are those defined in `<linux/errno.h>`.
 - If the buffer is filled and an attempt is made to write beyond the last position, then `write` must return -1 to indicate this error.
 
-### `llseek`
+#### `llseek`
 The `llseek function` is called when one moves the cursor position within a file. The entry point of this method in user space is `lseek()`. One can refer to the `man` page in order to print the full description of either method from user space: `man llseek` and `man lseek`. Its prototype looks as follows:
 ```
 loff_t(*llseek) (structfile *filp, loff_t offset, int whence);
@@ -280,7 +368,7 @@ You must use these macros in your implementation. If adding the offset causes th
 
 <hr>
 
-## Testing
+### Testing
 
 For testing your device driver, you can copy and modify the lab code so you to open your device and issue read/write/seek operations.
  It is possible for read, write, and seek to appear functional in your C test code,
@@ -305,6 +393,8 @@ To partially test `llseek` functionality you may use the `tail` system utility.
  Remember, your character device is a <i>file</i>, so we can use familiar file I/O operations 
  (e.g., `fopen`, `fclose`, `fseek`, etc..) for creating your test program. 
 
+ <hr><hr>
+ 
 ## Submission Instructions
 
 **Although your assignment will be graded from your files in the remote repository,**
