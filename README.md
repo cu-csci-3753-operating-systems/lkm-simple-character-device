@@ -3,26 +3,22 @@
   <IMG SRC="https://www.colorado.edu/cs/profiles/express/themes/cuspirit/logo.png" WIDTH=100 ALIGN="right" style="margin:20px">
 </figure>
 <hr>
-    
+Your task for the programming assignment is to implement a LKM device driver for a simple character device that supports reading, writing, and seeking. 
+This assignment assumes you have completed the first two labs that explore the File IO system calls. 
+**You are advised to complete those labs before beginning this assignment.** 
+Based on your exploration of the File IO system calls, you will now create a kernel module that can support the basic management of a device and transferring data to and from a character device.
+The device driver will maintain the kernel data structures and validate the transfer of data to guarantee  that memory is handled securely (no buffer overwrites).
+The LKM interface for devices is similar to the interface to a file.
+In fact, the disk is just a device (block device) and uses a similar interface to support file IO.
+
+### Traditional addition of System Calls to the Kernel Source
 Adding functionality to the kernel can be accomplished using different  methods.
  To create a new system call, you must write the code, find a new slot in the system call jump table, add the new function to the system call jump table, add new files to the build,  and then recompile the operating system.   There are thousands of files in the kernel that need to be build.  Luckily it is all done using makefiles so only the changed files need to be recompiled after fixing bugs or developing new functionality.   
  
 The more difficult part is getting that new kernel to be run.  You must place the kernel into the boot loader and reboot your system.  If the kernel fails to load because of the new code changes, you must reboot and select a previous kernel.  If you code does not work as required, you will need to fix the bug and go through all those steps again to boot the new kernel.
 
-### Here's a general outline of the process to install a custom kernel on a Linux system:
- 
-* Obtain the kernel source code: Download the source code of the custom kernel you wish to install. You can usually find it on the kernel developer's website.
-* Prepare the system: Ensure that your system meets the necessary requirements for building and installing a custom kernel. This may involve installing development tools, headers, and other dependencies.
-* Configure the kernel: Customize the kernel configuration to suit your specific needs. This can be done through the kernel's configuration menu (e.g., make menuconfig, make xconfig) or by modifying a configuration file directly.
-* Build the kernel: Use the appropriate commands (e.g., make) to compile the kernel source code into a usable binary. This process may take some time depending on your system's resources.
-* Install the kernel image: Copy the compiled kernel image (usually named vmlinuz) to the appropriate location on your system, typically in the /boot directory.
-* Reboot the system: After completing the previous steps, reboot your system to load the newly installed custom kernel. Ensure that you select the correct kernel entry during the boot process.
 
-It's important to note that installing a custom kernel carries some risks, and it's recommended to have a backup or recovery plan in case any issues arise. Additionally, the exact commands and steps may vary depending on your specific Linux distribution and the version of the custom kernel you're installing.  You must rebuild the kernel and walk through the steps to get it to boot, every time you make a change.
-
-We do have a lab writeup if you would like to try this on your own.
-
-### Adding functionality to the kernel dynamically
+### Adding functionality to the Kernel Dynamically
 <figure width=100%>
   <IMG SRC="images/Interaction-of-Linux-kernel-modules-with-their-environment.png" ALIGN="left" width="30%">
 </figure>
@@ -49,42 +45,26 @@ By conforming to the LKM interface, developers can ensure compatibility and
 
 Device drivers are used to enable communication between the operating system and various hardware devices. Almost all hardware devices in a computer system require a device driver for proper functioning. Some common types of devices that use device drivers include:
 
-* Printers and Scanners: Printers and scanners require device drivers to communicate with the operating system and enable printing, scanning, and other related functions.
-
-* Graphics and Display Devices: Graphics cards, video adapters, and display monitors utilize device drivers to provide the necessary interface for the operating system to control and display graphics on the screen.
-
-* Network Interface Cards (NICs): Network interface cards, including Ethernet adapters and Wi-Fi cards, require device drivers to enable network connectivity and facilitate data transmission between the computer and the network.
-
-* Sound Cards: Sound cards utilize device drivers to enable audio playback, recording, and control audio settings and features.
-
-* Storage Devices: Hard drives, solid-state drives (SSDs), optical drives (CD/DVD), and other storage devices require device drivers to facilitate data storage and retrieval operations.
-
-* USB Devices: USB devices such as keyboards, mice, game controllers, external hard drives, and other peripherals require device drivers to establish communication and enable their specific functionalities.
-
-* Input/Output Devices: Various input/output devices such as keyboards, mice, touchpads, touchscreens, and other input devices use device drivers to transmit input signals to the operating system and receive output instructions.
-
-* RAID Controllers: RAID controllers, used for managing redundant array of independent disks (RAID) configurations, require device drivers to manage data storage and fault tolerance. (We will visit this topic later in the semester)
-
-* Sensors: A wide range of sensors such as temperature sensors, humidity sensors, motion sensors, light sensors, and more produce a stream of characters that can be interpreted to get the sensor readings. These sensors can enable environmental monitoring, home automation, and various IoT (Internet of Things) applications.
-
-* Motor Controllers: The hardware port allows access to the physical devices such as motor controllers that would control motors for robotics projects, motorized vehicles, and other physical computing applications.    
+* Printers and Scanners
+* Graphics and Display Devices
+* Network Interface Cards
+* Storage Devices: Hard drives, solid-state drives (SSDs), optical drives (CD/DVD)
+* USB Devices: such as keyboards, mice, game controllers, external hard drives,
+* Input/Output Devices: such as keyboards, mice, touchpads, touchscreens
+* Sensors: such as temperature sensors, humidity sensors, motion sensors, light sensors, or motor controllers
 
 These are just a few examples of the many hardware devices that rely on device drivers to interact with the operating system. Device drivers provide the necessary software abstraction to ensure seamless communication and integration between hardware and software components.
 
 <hr>
 
-## Creating Your Device Driver
-Your task for the programming assignment is to implement a LKM device driver for a simple character device that supports reading, writing, and seeking. 
-This assignment assumes you have completed the first two labs that explore the File IO system calls. 
-**You are advised to complete those labs before beginning this assignment.** 
-Based on your exploration of the File IO system calls, you will now create a kernel module that can support the basic management of a device and transferring data to and from a character device.
+## Creating Your Own Loadable Kernel Modules
+Your task for the programming assignment is to implement a LKM device driver for a simple character device that supports reading, writing, and seeking. Based on your exploration of the File IO system calls, you will create a kernel module to support the basic management of a device and transferring data to and from a character device.
  
 Your device driver will allocate a kernel buffer when the module is loaded to store information that is written to the device.
- This device driver will be a virtual file that can be read and written.
- The device will also maintain the kernel data structures and validate the transfer of data to guarantee  that memory is handled securely (no buffer overwrites).
- The LKM interface for devices is similar to the interface to a file.
- In fact, the disk is just a device (block device) and uses a similar interface to support file IO.
-  
+ This device driver will be a virtual file that can be read and written randomly within the virtual file buffer.
+ The device must also maintain the kernel data structures and validate the transfer of data to guarantee  that memory is handled securely (no buffer overwrites).  Remember that the device driver code is part of the kernel and can corrupt the OS or even corrupt the disk devices to where your system is not recoverable.  Extreme care needs to be maintained to check all return codes and handle all possible buffer overflow issues before they occur.
+ 
+The LKM interface for devices is similar to the interface to a file.
 A simple device driver allows communication between an operating system and a specific hardware device. It provides an interface for the operating system to interact with the device, enabling it to send commands, receive data, and manage device operations.
 
 A simple device driver typically consists of two main components:
@@ -93,11 +73,11 @@ A simple device driver typically consists of two main components:
 
 Simple device drivers are often written for specific hardware devices with well-defined interfaces and straightforward functionality. They serve as examples or starting points for more complex device drivers and provide a basic understanding of how device drivers work.
 
-It's worth noting that the complexity of device drivers can vary significantly depending on the hardware and the desired level of functionality. Simple device drivers may only provide basic functionality, while more advanced drivers may support advanced features, error handling, and additional device-specific operations.
+It's worth noting that the complexity of device drivers can vary significantly depending on the hardware and the desired level of functionality. Simple device drivers may only provide basic functionality, while more advanced drivers may support advanced features and additional device-specific operations.
  
 <hr>
 
-### Building Loadable Kernel Modules (LKMs)
+### An Example of Building a Loadable Kernel Module 
 
 Recall that the kernel uses <i>jump tables</i> in order to call the correct system call. Device drivers use a similar jump table to map generic functions to specific code within the device driver. 
  Each LKM must define a standard jump table to support the kernels dynamic use of the module. The easiest way to understand the functionality that must be implemented is to create a simple module. 
@@ -113,13 +93,13 @@ int sample_init(void)
 	return 0;
 }
 
-void hello_exit(void)
+void sample_exit(void)
 {
 	printk(KERN_ALERT "inside %s function\n",__FUNCTION__);
 }
 
-module_init(hello_init);
-module_exit(hello_exit);
+module_init(sample_init);
+module_exit(sample_exit);
 ```
 In this code there are two functions defined,
  one that will be called when the LKM is loaded into the kernel,
@@ -135,17 +115,18 @@ At the bottom of the code are two macros that have been defined to help write de
 The first is `module_init` that specifies the name of the function that should be called when the LKM is loaded.  
  The other macro is used to specify the function to call when the LKM is unloaded.
  
-We will create a new module `helloworld` that will log the functions being called. 
- You should find the `hellomodule.c` file in the repository. 
- Create a new directory called `helloworld` in the `/home/kernel/` directory. 
- Open the `hellomodule.c` file in your editor.
+We will create a new module `sample_module` that will log the functions being called. 
+ You should find the `sample_module.c` file in the repository. 
+ Create a new directory called `sample_module` in the build directory. 
+ Open the `sample_module.c` file in your editor.
 
 This simple source file has all the code needed to install and uninstall an LKM in the kernel. 
  There are two macros listed at the bottom of the source file that setup the jump table for this LKM.
  Whenever the module is installed, the kernel will call the routine specified in the `module_init` macro, 
  and the routine specified in the `module_exit` will be called when the module is uninstalled. 
- For writing your LKM, you should use the `helloworld` module as a template.
+ For writing your LKM, you should use the `sample_module` module as a template.
 
+#### Steps for Building and Testing a Loadable Kernel Module 
  
 The steps shown for creating and testing an LKM are:
  1. Build the Loadable Kernel Module from the C code.
@@ -159,7 +140,7 @@ The steps shown for creating and testing an LKM are:
 
 #### 1. Build the Loadable Kernel Module from the C code
 
-Let's now compile the module. There are a couple of ways to add your module to the list of modules to be built for a kernel. One is to modify the makefile used by the kernel build. The other is to write your own local makefile and attach it to the build when we want to make the modules. The latter is a bit safer, so what we'll do is create a new file called `Makefile` in the `/home/kernel/helloworld` directory, then type the following lines in the file:
+Let's now compile the module. There are a couple of ways to add your module to the list of modules to be built for a kernel. One is to modify the makefile used by the kernel build. The other is to write your own local makefile and attach it to the build when we want to make the modules. The latter is a bit safer, so what we'll do is create a new file called `Makefile` in the repository directory, then type the following lines in the file:
 
 ```
 obj-m:= sample_module.o
@@ -238,6 +219,8 @@ Note that `simple_character_device` is a file, so we can change its permissions 
 ```
 sudo chmod 777 /dev/simple_character_device
 ```
+<hr>
+
 ####  6. Change the code to tell the kernel that your LKM will handle that device
 
 Recall that each device's virtual file is created with a major number associated with it, which allows the kernel to find the code that has been assigned to the major number when an applications tries to perform file operations upon it.
@@ -253,13 +236,15 @@ Its first argument is self-explanatory, as is the second (recall that we called 
 
 ####  7. Write the code to handle the other operations for your device
 
-Using `sample_module.c` as template, in a new C file `my_driver.c`, your task is to create a new character device driver that suports the following file operations: 
+The sample LKM does not specify the functions required to allow for randomly reading and writing.  
+Using `sample_module.c` as template, create your own character device driver in a new `my_driver.c` C file.
+Your LKM will need to support the  following file operations: 
 ```
 open, read, write, llseek, release
 ```
-You will need a character buffer is needed to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. The buffer must be an array of 1024 characters. Although you can statically allocate the space, see  `kmalloc` and `kfree` for the allocation and freeing of kernel memory. The kmalloc allocation engine is a powerful tool and easily learned because of its similarity to malloc. The function is fast (unless it blocks) and doesn’t clear the memory it obtains; the allocated region still holds its previous content.[1] The allocated region is also contiguous in physical memory.
+You will need a character buffer to store the data for this device. It will exist as long as the module is installed. Once it is uninstalled, all data will be lost. The buffer must be an array of 1024 characters. Although you can statically allocate the space, see  `kmalloc` and `kfree` for the allocation and release of kernel memory. The kmalloc allocation engine is a powerful tool and easily learned because of its similarity to malloc. The function is fast and doesn’t clear the memory it obtains; the allocated region still holds its previous content. The allocated region is also contiguous in physical memory.
  
-Remember that we mentioned that you will need to create a jump table to associate the functions that you write in your device driver and the operations that the kernel will access.  This is accompished with a kernel structure `file_operations`.
+Remember that we mentioned that you will need to create a jump table to associate the functions that you write in your device driver and the operations that the kernel will access.  This is accomplished with a kernel structure `file_operations`.
  
 Below is the definition of the somewhat involved `file_operations` struct:
 ```
@@ -283,9 +268,9 @@ struct file_operations {
     };  
 ```
 Except for its first member, all of its members are pointers to functions.  Each of these members supports some file operation functionality, and it is your responsibility to provide implementations of these operations. You can think of this struct like a Java interface in that it specifies the functionality that we the programmer must implement or using virtual functions in a C++ class.
-If you do not provide an implementation of any one of these functions, then the corresponding member is set to NULL by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.  Your implmentation will require ```open, read, write, llseek, release``` members to be defined.
+If you do not provide an implementation of any one of these functions, then the corresponding member is set to NULL by default, then the system will take care of the implementation of the function to give it some default functionality.  For this assignment, we won't provide implementations for the majority of these members.  Your implementation will require ```open, read, write, llseek, release``` members to be defined.
 
-Notice the variable types used in the definitionns.  
+Notice the variable types used in the return value and parameter definitions.  
  Notice the `_t` suffix naming convention, which stands for "type" and it is a way to abstract the actual data type used.  
  This is important as different systems have different sizes for values.
  For example, an implementation of `read` should return a value of "signed size type": if the output is positive, then it's a valid size; otherwise, it signals an error.
@@ -310,7 +295,7 @@ If we assign 0 to the major parameter, then the function will allocate a major d
 
 <hr>
 
-### Implementing a Character Device Driver
+### Implementing the Character Device Driver Functions
 
 Your main task is to give an implementation of five functions: `read`, `write`, `llseek`, `open`, `release`. You must name your functions:
 ```
@@ -358,7 +343,7 @@ You must use these macros in your implementation. If adding the offset causes th
 
 ### Hints
 
-- If you are having trouble getting started, use `helloworld.c` as a starting point. 
+- If you are having trouble getting started, use `sample_module.c` as a starting point. 
 - You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages). They will all be of the form `#include <linux/*.h>`.
 - Remember that your module lives in <i>kernel space</i> but some arguments of your functions point to buffers in <i>user space</i>.
 - Since we are implementing `llseek`, you will also need to keep track of the <i>present position</i> in the buffer. The `loff_t f_pos` field of the `file* filp` struct is essential for keeping track of this information. It represents the current reading or writing position. `loff_t` is a 64-bit value on all platforms
@@ -368,19 +353,19 @@ You must use these macros in your implementation. If adding the offset causes th
 
 <hr>
 
-### Testing
+### Testing the functionality of your implmentation
 
-For testing your device driver, you can copy and modify the lab code so you to open your device and issue read/write/seek operations.
- It is possible for read, write, and seek to appear functional in your C test code,
+For testing your device driver, you can copy and modify the lab code (`test.py`) to open your device and issue read/write/seek operations.
+ It is possible for your code for read, write, and seek to ***appear*** to work when accessed from your C test code,
  but not interface properly with unix system utilities such as `echo`, `tail`, `head`, and so on.
  This means your implementation is incorrect, so be sure that your code interfaces with these utilities.
  Recall that probes allow you to see how these utilities are interfacing with your device.
 
-An easy way to test the write functionality of your device driver is to perform I/O redirection in the terminal as follows:
+An simplest way to test the write functionality of your device driver is to perform I/O redirection in the terminal as follows:
 ```
 echo 'hello world' > /dev/simple_character_device
 ```
-which will write "hello world" to your character device driver. 
+which will write "hello world" characters (including the newline) to your character device driver. 
  
 To test the reading of characters from your device, try using the `cat` command, which will open, read repeatedly until EOF is reached, and then close the file.
 ```
