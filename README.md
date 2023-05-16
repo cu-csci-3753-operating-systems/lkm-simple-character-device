@@ -3,8 +3,9 @@
   <IMG SRC="https://www.colorado.edu/cs/profiles/express/themes/cuspirit/logo.png" WIDTH=100 ALIGN="right" style="margin:20px">
 </figure>
 <hr>
+ 
 Your task for the programming assignment is to implement a LKM device driver for a simple character device that supports reading, writing, and seeking. 
-This assignment assumes you have completed the first two labs that explore the File IO system calls. 
+This assignment assumes you have completed the first two labs that explore the File IO system calls.
 **You are advised to complete those labs before beginning this assignment.** 
 Based on your exploration of the File IO system calls, you will now create a kernel module that can support the basic management of a device and transferring data to and from a character device.
 The device driver will maintain the kernel data structures and validate the transfer of data to guarantee  that memory is handled securely (no buffer overwrites).
@@ -343,12 +344,16 @@ You must use these macros in your implementation. If adding the offset causes th
 
 ### Hints
 
+<figure width=100%>
+  <IMG SRC="images/dev_read.png" ALIGN="right" width="50%">
+</figure>
+
 - If you are having trouble getting started, use `sample_module.c` as a starting point. 
 - You will need to keep track of what header files are needed for implementing the five functions (these can be found by visiting their man pages). They will all be of the form `#include <linux/*.h>`.
-- Remember that your module lives in <i>kernel space</i> but some arguments of your functions point to buffers in <i>user space</i>.
+- Remember that your module lives in <i>kernel space</i> but some arguments of your functions point to buffers in <i>user space</i>. You will need to transfer the data to/from kernel and user data space.
 - Since we are implementing `llseek`, you will also need to keep track of the <i>present position</i> in the buffer. The `loff_t f_pos` field of the `file* filp` struct is essential for keeping track of this information. It represents the current reading or writing position. `loff_t` is a 64-bit value on all platforms
 (`long long` in gcc terminology). The driver can read this value if it needs to know the current position in the file (i.e., your buffer). However, `read` and `write` should update the position using the pointer they receive as the last argument instead of acting on `filp->f_pos` directly. The purpose of the `llseek` method is to change the file position, which is why it will be modifying `filp->f_pos` directly. This is illustrated in the figure below.
-![Screen Shot 2021-08-20 at 9 49 40 PM](https://user-images.githubusercontent.com/5934852/130309813-f673eebd-68ff-47fe-af13-359f1abb3900.png)
+
  - For more info on the `file` struct, visit https://docs.huihoo.com/doxygen/linux/kernel/3.7/structfile.html (even though most fields will not be used for your assignment).
 
 <hr>
