@@ -9,7 +9,7 @@ int sample_module_init(void)
 	return 0;
 }
 
-void sample_module__exit(void)
+void sample_module_exit(void)
 {
 	printk(KERN_ALERT "Sample Module: in %s function\n",__FUNCTION__);
 }
