@@ -1,7 +1,7 @@
-
-
 #include<linux/init.h>
 #include<linux/module.h>
+
+MODULE_LICENSE("");
 
 int sample_module_init(void)
 {
